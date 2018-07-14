@@ -1,0 +1,24 @@
+{
+  "extends": "eslint-config-airbnb",
+  "rules": {
+    "import/no-unresolved": 0,
+    "import/extensions": 0,
+    "no-mixed-operators": 0,
+    "no-continue": 0,
+    "no-await-in-loop": 0,
+    "max-len": 0,
+    "no-param-reassign": 0,
+    "react/prefer-stateless-function": 0,
+    "react/jsx-filename-extension": 0
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "mocha": true
+  },
+  "plugins": [
+    "react",
+    "jsx-a11y",
+    "import"
+  ]
+}

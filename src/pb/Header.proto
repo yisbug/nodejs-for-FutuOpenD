@@ -1,0 +1,14 @@
+syntax = "proto2";
+package Header;
+
+message Request
+{
+  required fixed64 szHeaderFlag = 1; // 包头起始标志，固定为“FT”
+  required uint32 nProtoID = 2; // 协议ID
+  required fixed64 nProtoFmtType = 3;  // 协议格式类型，0为Protobuf格式，1为Json格式
+  required fixed64 nProtoVer = 4; // 协议版本，用于迭代兼容, 目前填0
+  required uint32 nSerialNo = 5; // 包序列号，用于对应请求包和回包, 要求递增
+  required uint32 nBodyLen = 6; // 包体长度
+  required fixed64 arrBodySHA1 = 7; // 包体原始数据(解密后)的SHA1哈希值
+  required fixed64 arrReserved = 8; // 保留8字节扩展
+};

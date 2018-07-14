@@ -1,0 +1,36 @@
+{
+  "name": "FutuQuant",
+  "version": "0.0.1",
+  "description": "FutuQuant-Nodejs",
+  "main": "src/futuquant.js",
+  "scripts": {
+    "test": "mocha -r esm -t 600000 -b -w test/*",
+    "doc": "rm -rf doc && jsdoc -c jsdoc.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/yisbug/futuquant.git"
+  },
+  "author": "yisbug",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yisbug/futuquant/issues"
+  },
+  "homepage": "https://github.com/yisbug/futuquant#readme",
+  "dependencies": {
+    "bunyan": "^1.8.12",
+    "bunyan-debug-stream": "^1.0.8",
+    "protobufjs": "^6.8.6"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.9.1",
+    "esm": "^3.0.55",
+    "jsdoc": "^3.5.5",
+    "mocha": "^5.2.0",
+    "should": "^13.2.1"
+  }
+}

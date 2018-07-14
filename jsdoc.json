@@ -1,0 +1,20 @@
+{
+  "source": {
+    "include": [
+      "."
+    ],
+    "exclude": [
+      "node_modules"
+    ],
+    "includePattern": ".+\\.m?js(doc|x)?$"
+  },
+  "opts": {
+    "destination": "doc",
+    "recurse": true,
+    "readme": "README.md",
+    "package": "package.json"
+  },
+  "plugins": [
+    "plugins/markdown"
+  ]
+}
