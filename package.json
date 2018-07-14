@@ -1,5 +1,5 @@
 {
-  "name": "FutuQuant",
+  "name": "futuquant",
   "version": "0.0.1",
   "description": "FutuQuant-Nodejs",
   "main": "src/futuquant.js",
