@@ -17,7 +17,7 @@ const pwdMd5 = ftOpenDConfig.match(/trade_pwd_md5>(.*?)<\/trade_pwd_md5/)[1];
 console.log('userID', userID, 'pwdMd5', pwdMd5);
 
 const ft = new FtQuant({
-  ip: '127.0.0.11',
+  ip: '127.0.0.1',
   port: 11111,
   userID,
 });

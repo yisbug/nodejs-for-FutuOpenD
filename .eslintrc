@@ -7,9 +7,8 @@
     "no-continue": 0,
     "no-await-in-loop": 0,
     "max-len": 0,
-    "no-param-reassign": 0,
-    "react/prefer-stateless-function": 0,
-    "react/jsx-filename-extension": 0
+    "eol-last": 0,
+    "no-param-reassign": 0
   },
   "env": {
     "browser": true,
@@ -17,8 +16,6 @@
     "mocha": true
   },
   "plugins": [
-    "react",
-    "jsx-a11y",
     "import"
   ]
 }
