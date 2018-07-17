@@ -1,4 +1,3 @@
-
 import Socket from './socket';
 
 // Common
@@ -666,7 +665,7 @@ class FutuQuant {
    * @returns {BasicQot[]} basicQotList
    */
   subQotUpdateBasicQot(callback) {
-    return this.socket.subNotify(3005, callback);
+    return this.socket.subNotify(3005, data => callback(data.basicQotList));
   }
   /**
    * Qot_GetKL.proto协议返回对象

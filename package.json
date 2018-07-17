@@ -5,7 +5,7 @@
   "main": "src/futuquant.js",
   "scripts": {
     "test": "mocha -r esm -t 600000 -b -w test/*",
-    "doc": "rm -rf doc && jsdoc -c jsdoc.json"
+    "doc": "jsdoc -c jsdoc.json"
   },
   "repository": {
     "type": "git",
