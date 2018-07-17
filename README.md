@@ -15,7 +15,7 @@ npm install futuquant
 
 ### 文档
 
-[点击查看文档](http://htmlpreview.github.io/?https://github.com/yisbug/futuquant/blob/master/doc/futuquant/0.1.0/index.html)
+[点击查看文档](https://yisbug.github.io/futuquant/doc/futuquant/0.1.0/index.html)
 
 ### 使用
 
