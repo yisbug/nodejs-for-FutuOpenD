@@ -1,25 +1,30 @@
-## futuquant的nodejs版本
+## FutuQuant量化接口Nodejs版本
 
-基于futuquant v3.1.2，使用前需要先安装futuquant，并启动FutuOpenD服务。
+基于FutuQuant v3.1.2底层协议封装的nodejs版本接口，数据格式使用protobuf，使用前请先在本地或者服务端启动FutuOpenD服务。
 
-依赖：
+相关说明：
 
-* ES6，对应nodejs版本v8.5.0以上，启动时添加参数：--experimental-modules，参考：[v8.5.0 proposal #15308](https://github.com/nodejs/node/pull/15308)
-* futuquant v3.1.2，参考：[FutunnOpen/futuquant](https://github.com/FutunnOpen/futuquant/)
+* 使用了ES6 modules，对应nodejs版本v8.5.0以上，启动时添加参数：--experimental-modules，参考：[v8.5.0 proposal #15308](https://github.com/nodejs/node/pull/15308)。
+* 底层协议基于FutuQuant v3.1.2，参考：[FutunnOpen/futuquant](https://github.com/FutunnOpen/futuquant/)。
+* 数据传输格式强制使用protobuf。
+* **为了方便使用，请注意相关接口参数及返回结果和富途官方版本不一致，详细请参考API文档**。
+* API文档相关：[https://yisbug.github.io/futuquant/doc/index.html](https://yisbug.github.io/futuquant/doc/index.html)
 
 ### 安装
 
-```
-npm install futuquant
+``` 
+npm install futuquant --save
 ```
 
-### 文档
+或者
 
-[点击查看文档](https://yisbug.github.io/futuquant/doc/futuquant/0.1.0/index.html)
+``` 
+yarn add futuquant
+```
 
 ### 使用
 
-```javascript
+``` javascript
 import FtQuant from 'futuquant';
 
 const ft = new FtQuant({
@@ -35,7 +40,8 @@ const init = async () => {
   res = await ft.getGlobalState(); // 获取全局状态
   console.log('getGlobalState', res);
   await ft.trdUnlockTrade(true, 'md5'); // 解锁交易密码
-  await ft.setCommonTradeHeader(0); // 设置为港股的仿真环境
+  const accID = (await this.ft.trdGetAccList())[0].accID;
+  await ft.setCommonTradeHeader(1, accID, 1); // 设置为港股的真实环境
 };
 
 init();
@@ -44,7 +50,9 @@ init();
 
 ### 测试
 
-请先修改`test/futuquant.test.js`中`FutuOpenDXMLPath`的路径。
+请先修改`test/futuquant.test.js`中`FutuOpenDXMLPath`的路径，然后执行`npm install`或`yarn`安装相关依赖。
+
+运行测试：
 
 ```
 npm test

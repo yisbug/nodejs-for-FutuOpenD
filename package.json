@@ -5,7 +5,7 @@
   "main": "src/futuquant.js",
   "scripts": {
     "test": "mocha -r esm -t 600000 -b -w test/*",
-    "doc": "jsdoc -c jsdoc.json"
+    "doc": "rm -rf doc && jsdoc -c jsdoc.json -t ./node_modules/ink-docstrap/template"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.12.0",
     "esm": "^3.0.55",
+    "ink-docstrap": "^1.3.2",
     "jsdoc": "^3.5.5",
     "mocha": "^5.2.0",
     "should": "^13.2.1"
