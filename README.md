@@ -18,7 +18,7 @@
 
 ### 更新记录
 
-最新版本：v0.1.2，更新日期2018.07.20，[点击查看更新日志](CHANGELOG.md)
+最新版本：v0.1.2，更新日期2018.07.20，[点击查看更新日志](https://github.com/yisbug/futuquant/blob/master/CHANGELOG.md)
 
 ### 安装
 
