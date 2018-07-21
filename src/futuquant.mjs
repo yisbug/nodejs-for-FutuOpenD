@@ -1,3 +1,5 @@
+import bunyan from 'bunyan';
+import bunyanDebugStream from 'bunyan-debug-stream';
 import Socket from './socket';
 
 // Common
@@ -474,9 +476,10 @@ class FutuQuant {
    * @param {string} params.ip FutuOpenD服务IP
    * @param {number} params.port FutuOpenD服务端口
    * @param {number} params.userID 牛牛号
+   * @param {object} [logger] 日志对象，若不传入，则使用bunyan.createLogger创建
    * @memberof FutuQuant
    */
-  constructor(params) {
+  constructor(params, logger) {
     if (typeof params !== 'object') throw new Error('传入参数类型错误');
     const {
       ip,
@@ -487,11 +490,28 @@ class FutuQuant {
     if (!port) throw new Error('必须指定FutuOpenD服务的port');
     if (!userID) throw new Error('必须指定FutuOpenD服务的牛牛号');
 
+    this.logger = logger;
+    const bunyanLogger = bunyan.createLogger({
+      name: 'sys',
+      streams: [{
+        level: 'debug',
+        type: 'raw',
+        serializers: bunyanDebugStream.serializers,
+        stream: bunyanDebugStream({ forceColor: true }),
+      }],
+    });
+    if (this.logger) {
+      if (!Object.keys(this.logger).includes('debug', 'info', 'warn', 'error', 'fatal', 'trace')) {
+        this.logger = bunyanLogger;
+      }
+    } else {
+      this.logger = bunyanLogger;
+    }
     /**
      * 实例化的socket对象
      * @type {Socket}
      */
-    this.socket = new Socket(ip, port); // 所有行情拉取接口
+    this.socket = new Socket(ip, port, this.logger); // 所有行情拉取接口
     /**
      * 牛牛号
      * @type {number}

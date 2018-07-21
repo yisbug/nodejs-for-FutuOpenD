@@ -36,6 +36,8 @@ yarn add futuquant
 ``` javascript
 const FtQuant = require('./src/futuquant');
 const fs = require('fs');
+const bunyan = require('bunyan');
+const bunyanDebugStream = require('bunyan-debug-stream');
 const path = require('path');
 
 const FILENAME = typeof __filename !== 'undefined' ? __filename : (/^ +at (?:file:\/*(?=\/)|)(.*?):\d+:\d+$/m.exec(Error().stack) || '')[1];
@@ -50,11 +52,22 @@ const ftOpenDConfig = fs.readFileSync(FutuOpenDXMLPath, {
 const userID = ftOpenDConfig.match(/login_account>(\d*?)<\/login_account/)[1];
 const pwdMd5 = ftOpenDConfig.match(/trade_pwd_md5>(.*?)<\/trade_pwd_md5/)[1];
 
+// 自定义日志对象
+const bunyanLogger = bunyan.createLogger({
+  name: 'sys',
+  streams: [{
+    level: 'debug',
+    type: 'raw',
+    serializers: bunyanDebugStream.serializers,
+    stream: bunyanDebugStream({ forceColor: true }),
+  }],
+});
+
 const ft = new FtQuant({
   ip: '127.0.0.1', // FutuOpenD服务IP
   port: 11111, // FutuOpenD服务端口
   userID, // 牛牛号
-});
+}, bunyanLogger);
 
 const init = async () => {
   let res = null;

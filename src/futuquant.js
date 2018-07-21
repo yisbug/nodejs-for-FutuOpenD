@@ -8,6 +8,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _bunyan = require('bunyan');
+
+var _bunyan2 = _interopRequireDefault(_bunyan);
+
+var _bunyanDebugStream = require('bunyan-debug-stream');
+
+var _bunyanDebugStream2 = _interopRequireDefault(_bunyanDebugStream);
+
 var _socket = require('./socket');
 
 var _socket2 = _interopRequireDefault(_socket);
@@ -489,9 +497,10 @@ var FutuQuant = function () {
    * @param {string} params.ip FutuOpenD服务IP
    * @param {number} params.port FutuOpenD服务端口
    * @param {number} params.userID 牛牛号
+   * @param {object} [logger] 日志对象，若不传入，则使用bunyan.createLogger创建
    * @memberof FutuQuant
    */
-  function FutuQuant(params) {
+  function FutuQuant(params, logger) {
     _classCallCheck(this, FutuQuant);
 
     if ((typeof params === 'undefined' ? 'undefined' : _typeof(params)) !== 'object') throw new Error('传入参数类型错误');
@@ -503,11 +512,28 @@ var FutuQuant = function () {
     if (!port) throw new Error('必须指定FutuOpenD服务的port');
     if (!userID) throw new Error('必须指定FutuOpenD服务的牛牛号');
 
+    this.logger = logger;
+    var bunyanLogger = _bunyan2.default.createLogger({
+      name: 'sys',
+      streams: [{
+        level: 'debug',
+        type: 'raw',
+        serializers: _bunyanDebugStream2.default.serializers,
+        stream: (0, _bunyanDebugStream2.default)({ forceColor: true })
+      }]
+    });
+    if (this.logger) {
+      if (!Object.keys(this.logger).includes('debug', 'info', 'warn', 'error', 'fatal', 'trace')) {
+        this.logger = bunyanLogger;
+      }
+    } else {
+      this.logger = bunyanLogger;
+    }
     /**
      * 实例化的socket对象
      * @type {Socket}
      */
-    this.socket = new _socket2.default(ip, port); // 所有行情拉取接口
+    this.socket = new _socket2.default(ip, port, this.logger); // 所有行情拉取接口
     /**
      * 牛牛号
      * @type {number}

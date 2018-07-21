@@ -29,10 +29,6 @@ var _crypto = require('crypto');
 
 var _crypto2 = _interopRequireDefault(_crypto);
 
-var _logger = require('./logger');
-
-var _logger2 = _interopRequireDefault(_logger);
-
 var _protoid = require('./protoid');
 
 var _protoid2 = _interopRequireDefault(_protoid);
@@ -62,8 +58,9 @@ var Socket = function () {
    * Creates an instance of Socket.
    * @param {string} ip OpenD服务Ip
    * @param {number} port OpenD服务端口
+   * @param {object} logger 日志对象
    */
-  function Socket(ip, port) {
+  function Socket(ip, port, logger) {
     var _this = this;
 
     _classCallCheck(this, Socket);
@@ -78,6 +75,11 @@ var Socket = function () {
      * @type {number}
      */
     this.port = port;
+    /**
+     * 日志对象
+     * @type {object}
+     */
+    this.logger = logger;
 
     id += 1;
     /**
@@ -109,19 +111,19 @@ var Socket = function () {
     this.socket = new _net2.default.Socket();
     this.socket.setKeepAlive(true);
     this.socket.on('error', function (data) {
-      _logger2.default.error(_this.name + ' on error: ' + data);
+      _this.logger.error(_this.name + ' on error: ' + data);
       _this.socket.destroy();
       _this.isConnect = false;
     });
     this.socket.on('timeout', function (e) {
-      _logger2.default.error(_this.name + ' on timeout.', e);
+      _this.logger.error(_this.name + ' on timeout.', e);
       _this.socket.destroy();
       _this.isConnect = false;
     });
     // 为客户端添加“close”事件处理函数
     this.socket.on('close', function () {
       var errMsg = _this.name + ' on closed and retry connect on 5 seconds.';
-      _logger2.default.error(errMsg);
+      _this.logger.error(errMsg);
       _this.isConnect = false;
       // 5s后重连
       if (_this.timerRecontent) return;
@@ -161,7 +163,7 @@ var Socket = function () {
           host: _this2.ip,
           timeout: 1000 * 30
         }, async function () {
-          _logger2.default.debug(_this2.name + ' connect success:' + _this2.ip + ':' + _this2.port);
+          _this2.logger.debug(_this2.name + ' connect success:' + _this2.ip + ':' + _this2.port);
           _this2.isConnect = true;
           if (typeof _this2.connectCallback === 'function') _this2.connectCallback();
           resolve();
@@ -217,9 +219,9 @@ var Socket = function () {
     value: function send(protoName, message) {
       var _this3 = this;
 
-      if (!this.isConnect) return _logger2.default.warn(this.name + ' \u5C1A\u672A\u8FDE\u63A5\uFF0C\u65E0\u6CD5\u53D1\u9001\u8BF7\u6C42\u3002');
+      if (!this.isConnect) return this.logger.warn(this.name + ' \u5C1A\u672A\u8FDE\u63A5\uFF0C\u65E0\u6CD5\u53D1\u9001\u8BF7\u6C42\u3002');
       var protoId = _protoid2.default[protoName];
-      if (!protoId) return _logger2.default.warn('\u627E\u4E0D\u5230\u5BF9\u5E94\u7684\u534F\u8BAEId:' + protoName);
+      if (!protoId) return this.logger.warn('\u627E\u4E0D\u5230\u5BF9\u5E94\u7684\u534F\u8BAEId:' + protoName);
       // 请求序列号，自增
       if (this.requestId > 1000000) this.requestId = 1000;
       var requestId = this.requestId;
@@ -239,7 +241,7 @@ var Socket = function () {
       var sha1Buffer = new Uint8Array(20).map(function (item, index) {
         return Number('0x' + sha1.substr(index * 2, 2));
       });
-      _logger2.default.debug('request:' + protoName + '(' + protoId + '),reqId:' + requestId);
+      this.logger.debug('request:' + protoName + '(' + protoId + '),reqId:' + requestId);
       // 处理包头
       var buffer = Buffer.concat([Buffer.from('FT'), // 包头起始标志，固定为“FT”
       Buffer.from(new Uint32Array([protoId]).buffer), // 协议ID
@@ -257,7 +259,7 @@ var Socket = function () {
           var result = response.decode(responseBuffer).toJSON();
           if (result.retType === 0) return resolve(result.s2c);
           var errMsg = '\u670D\u52A1\u5668\u8FD4\u56DE\u7ED3\u679C\u5931\u8D25,request:' + protoName + '(' + protoId + '),reqId:' + requestId + ',errMsg:' + result.retMsg;
-          _logger2.default.error(errMsg);
+          _this3.logger.error(errMsg);
           return reject(new Error(errMsg));
         };
       });
@@ -297,7 +299,7 @@ var Socket = function () {
           arrReserved: this.recvBuffer.slice(36, 44) // 保留8字节扩展
         };
         if (this.header.szHeaderFlag !== 'FT') throw new Error('接收的包头数据格式错误');
-        _logger2.default.debug('response:' + ProtoName[this.header.nProtoID] + '(' + this.header.nProtoID + '),reqId:' + this.header.nSerialNo + ',bodyLen:' + bodyLen);
+        this.logger.debug('response:' + ProtoName[this.header.nProtoID] + '(' + this.header.nProtoID + '),reqId:' + this.header.nSerialNo + ',bodyLen:' + bodyLen);
       }
 
       // 已经接收指定包体长度的全部数据，切割包体buffer
@@ -331,7 +333,7 @@ var Socket = function () {
             this.cacheNotifyCallback[protoId](result.s2c);
           } catch (e) {
             var errMsg = '\u901A\u77E5\u56DE\u8C03\u6267\u884C\u9519\u8BEF\uFF0Cresponse:' + ProtoName[protoId] + '(' + protoId + '),reqId:' + reqId + ',bodyLen:' + bodyLen + '\uFF0C\u5806\u6808\uFF1A' + e.stack;
-            _logger2.default.error(errMsg);
+            this.logger.error(errMsg);
             throw new Error(errMsg);
           }
         }
