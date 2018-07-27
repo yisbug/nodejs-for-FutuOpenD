@@ -24,6 +24,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var sleep = async function sleep(time) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, time);
+  });
+};
+
 // Common
 /**
  * 协议返回值
@@ -46,7 +52,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @property {number} connID 当前TCP连接的连接ID，一条连接的唯一标识，InitConnect协议会返回
  * @property {number} serialNo 包头中的包自增序列号
  */
-
 // Qot_Common
 /**
  * 行情市场
@@ -490,6 +495,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 /**
  * 封装FutuQuant底层协议模块
  */
+
 var FutuQuant = function () {
   /**
    * Creates an instance of FutuQuant.
@@ -497,37 +503,43 @@ var FutuQuant = function () {
    * @param {string} params.ip FutuOpenD服务IP
    * @param {number} params.port FutuOpenD服务端口
    * @param {number} params.userID 牛牛号
+   * @param {TrdMarket} [params.market] 市场环境
    * @param {object} [logger] 日志对象，若不传入，则使用bunyan.createLogger创建
    * @memberof FutuQuant
    */
   function FutuQuant(params, logger) {
+    var _this = this;
+
     _classCallCheck(this, FutuQuant);
 
     if ((typeof params === 'undefined' ? 'undefined' : _typeof(params)) !== 'object') throw new Error('传入参数类型错误');
     var ip = params.ip,
         port = params.port,
-        userID = params.userID;
+        userID = params.userID,
+        market = params.market;
 
     if (!ip) throw new Error('必须指定FutuOpenD服务的ip');
     if (!port) throw new Error('必须指定FutuOpenD服务的port');
     if (!userID) throw new Error('必须指定FutuOpenD服务的牛牛号');
 
     this.logger = logger;
-    var bunyanLogger = _bunyan2.default.createLogger({
-      name: 'sys',
-      streams: [{
-        level: 'debug',
-        type: 'raw',
-        serializers: _bunyanDebugStream2.default.serializers,
-        stream: (0, _bunyanDebugStream2.default)({ forceColor: true })
-      }]
-    });
+    this.market = market || 1; // 当前市场环境
+
     if (this.logger) {
-      if (!Object.keys(this.logger).includes('debug', 'info', 'warn', 'error', 'fatal', 'trace')) {
-        this.logger = bunyanLogger;
-      }
-    } else {
-      this.logger = bunyanLogger;
+      ['debug', 'info', 'warn', 'error', 'fatal', 'trace'].forEach(function (key) {
+        if (typeof _this.logger[key] !== 'function') _this.logger = null;
+      });
+    }
+    if (!this.logger) {
+      this.logger = _bunyan2.default.createLogger({
+        name: 'sys',
+        streams: [{
+          level: 'debug',
+          type: 'raw',
+          serializers: _bunyanDebugStream2.default.serializers,
+          stream: (0, _bunyanDebugStream2.default)({ forceColor: true })
+        }]
+      });
     }
     /**
      * 实例化的socket对象
@@ -556,7 +568,7 @@ var FutuQuant = function () {
     this.timerKeepLive = null;
   }
   /**
-   * InitConnect.proto协议返回对象
+   * 初始化连接，InitConnect.proto协议返回对象
    * @typedef InitConnectResponse
    * @property {number} serverVer FutuOpenD的版本号
    * @property {number} loginUserID FutuOpenD登陆的牛牛用户ID
@@ -583,31 +595,32 @@ var FutuQuant = function () {
   _createClass(FutuQuant, [{
     key: 'initConnect',
     value: async function initConnect(params) {
-      var _this = this;
+      var _this2 = this;
 
+      // 初始化连接
       if (this.inited) throw new Error('请勿重复初始化连接');
       return new Promise(async function (resolve) {
-        _this.inited = true;
-        _this.socket.onConnect(async function () {
-          var res = await _this.socket.send('InitConnect', Object.assign({
+        _this2.inited = true;
+        _this2.socket.onConnect(async function () {
+          var res = await _this2.socket.send('InitConnect', Object.assign({
             clientVer: 101,
             clientID: 'yisbug',
             recvNotify: true
           }, params));
           // 保持心跳
-          _this.connID = res.connID;
-          _this.connAESKey = res.connAESKey;
-          _this.keepAliveInterval = res.keepAliveInterval;
-          if (_this.timerKeepLive) {
-            clearInterval(_this.timerKeepLive);
-            _this.timerKeepLive = null;
+          _this2.connID = res.connID;
+          _this2.connAESKey = res.connAESKey;
+          _this2.keepAliveInterval = res.keepAliveInterval;
+          if (_this2.timerKeepLive) {
+            clearInterval(_this2.timerKeepLive);
+            _this2.timerKeepLive = null;
           }
-          _this.timerKeepLive = setInterval(function () {
-            return _this.keepAlive();
-          }, 1000 * _this.keepAliveInterval);
+          _this2.timerKeepLive = setInterval(function () {
+            return _this2.keepAlive();
+          }, 1000 * _this2.keepAliveInterval);
           resolve(res);
         });
-        await _this.socket.init();
+        await _this2.socket.init();
       });
     }
     /**
@@ -633,6 +646,7 @@ var FutuQuant = function () {
   }, {
     key: 'getGlobalState',
     value: function getGlobalState() {
+      // 1002获取全局状态
       return this.socket.send('GetGlobalState', {
         userID: this.userID
       });
@@ -645,6 +659,7 @@ var FutuQuant = function () {
   }, {
     key: 'keepAlive',
     value: async function keepAlive() {
+      // 1004保活心跳
       var time = await this.socket.send('KeepAlive', {
         time: Math.round(Date.now() / 1000)
       });
@@ -671,6 +686,7 @@ var FutuQuant = function () {
   }, {
     key: 'qotSub',
     value: function qotSub(params) {
+      // 3001订阅或者反订阅
       return this.socket.send('Qot_Sub', Object.assign({
         securityList: [],
         subTypeList: [],
@@ -699,6 +715,7 @@ var FutuQuant = function () {
   }, {
     key: 'qotRegQotPush',
     value: function qotRegQotPush(params) {
+      // 3002注册行情推送
       return this.socket.send('Qot_RegQotPush', Object.assign({
         securityList: [],
         subTypeList: [],
@@ -725,7 +742,7 @@ var FutuQuant = function () {
     key: 'qotGetSubInfo',
     value: function qotGetSubInfo() {
       var isReqAllConn = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
+      // 3003获取订阅信息
       return this.socket.send('Qot_RegQotPush', {
         isReqAllConn: isReqAllConn
       });
@@ -742,10 +759,11 @@ var FutuQuant = function () {
 
   }, {
     key: 'qotGetBasicQot',
-    value: function qotGetBasicQot(securityList) {
-      return this.socket.send('Qot_GetBasicQot', {
+    value: async function qotGetBasicQot(securityList) {
+      // 3004获取股票基本行情
+      return (await this.socket.send('Qot_GetBasicQot', {
         securityList: securityList
-      });
+      })).basicQotList;
     }
     /**
      * 注册股票基本报价通知，需要先调用订阅接口
@@ -758,6 +776,7 @@ var FutuQuant = function () {
   }, {
     key: 'subQotUpdateBasicQot',
     value: function subQotUpdateBasicQot(callback) {
+      // 注册股票基本报价通知
       return this.socket.subNotify(3005, function (data) {
         return callback(data.basicQotList);
       });
@@ -788,6 +807,7 @@ var FutuQuant = function () {
   }, {
     key: 'qotGetKL',
     value: function qotGetKL(params) {
+      // 3006获取K线
       return this.socket.send('Qot_GetKL', Object.assign({
         rehabType: 1, // Qot_Common.RehabType,复权类型
         klType: 1, // Qot_Common.KLType,K线类型
@@ -813,6 +833,7 @@ var FutuQuant = function () {
   }, {
     key: 'subQotUpdateKL',
     value: function subQotUpdateKL(callback) {
+      // 注册K线推送
       return this.socket.subNotify(3007, callback);
     }
     /**
@@ -831,6 +852,7 @@ var FutuQuant = function () {
   }, {
     key: 'qotGetRT',
     value: function qotGetRT(security) {
+      // 获取分时
       return this.socket.send('Qot_GetRT', {
         security: security
       });
@@ -845,6 +867,7 @@ var FutuQuant = function () {
   }, {
     key: 'subQotUpdateRT',
     value: function subQotUpdateRT(callback) {
+      // 注册分时推送
       return this.socket.subNotify(3009, callback);
     }
     /**
@@ -869,7 +892,7 @@ var FutuQuant = function () {
     key: 'qotGetTicker',
     value: function qotGetTicker(security) {
       var maxRetNum = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
-
+      // 3010获取逐笔
       return this.socket.send('Qot_GetTicker', {
         security: security,
         maxRetNum: maxRetNum
@@ -886,6 +909,7 @@ var FutuQuant = function () {
   }, {
     key: 'subQotUpdateTicker',
     value: function subQotUpdateTicker(callback) {
+      // 注册逐笔推送
       return this.socket.subNotify(3011, callback);
     }
     /**
@@ -905,26 +929,48 @@ var FutuQuant = function () {
 
   }, {
     key: 'qotGetOrderBook',
-    value: function qotGetOrderBook(security) {
+    value: async function qotGetOrderBook(security) {
       var num = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
-
-      return this.socket.send('Qot_GetOrderBook', {
+      // 3012获取买卖盘
+      var result = await this.socket.send('Qot_GetOrderBook', {
         security: security,
         num: num
       });
+      result.orderBookAskList = result.orderBookAskList || [];
+      result.orderBookBidList = result.orderBookBidList || [];
+      result.sellList = result.orderBookAskList;
+      result.buyList = result.orderBookBidList;
+      result.sellList.forEach(function (item) {
+        item.volume = Number(item.volume);
+      });
+      result.buyList.forEach(function (item) {
+        item.volume = Number(item.volume);
+      });
+      return result;
     }
     /**
      * 注册买卖盘推送，需要先调用订阅接口
      * Qot_UpdateOrderBook.proto - 3013推送买卖盘
      * @async
      * @param {function} callback 回调
-     * @returns {QotGetOrderBookResponse}
+     * @const result = await s {QotGetOrderBookResponse}
      */
 
   }, {
     key: 'subQotUpdateOrderBook',
     value: function subQotUpdateOrderBook(callback) {
-      return this.socket.subNotify(3013, callback);
+      // 注册买卖盘推送
+      return this.socket.subNotify(3013, function (data) {
+        data.sellList = data.orderBookAskList || [];
+        data.buyList = data.orderBookBidList || [];
+        data.sellList.forEach(function (item) {
+          item.volume = Number(item.volume);
+        });
+        data.buyList.forEach(function (item) {
+          item.volume = Number(item.volume);
+        });
+        callback(data);
+      });
     }
     /**
      * Qot_GetBroker.proto协议返回对象
@@ -942,10 +988,16 @@ var FutuQuant = function () {
 
   }, {
     key: 'qotGetBroker',
-    value: function qotGetBroker(security) {
-      return this.socket.send('Qot_GetBroker', {
+    value: async function qotGetBroker(security) {
+      // 3014获取经纪队列
+      var result = await this.socket.send('Qot_GetBroker', {
         security: security
       });
+      result.brokerAskList = result.brokerAskList || [];
+      result.brokerBidList = result.brokerBidList || [];
+      result.sellList = result.brokerAskList;
+      result.buyList = result.brokerBidList;
+      return result;
     }
     /**
      * 注册经纪队列推送，需要先调用订阅接口
@@ -958,7 +1010,14 @@ var FutuQuant = function () {
   }, {
     key: 'subQotUpdateBroker',
     value: function subQotUpdateBroker(callback) {
-      return this.socket.subNotify(3015, callback);
+      // 注册经纪队列推送
+      return this.socket.subNotify(3015, function (result) {
+        result.brokerAskList = result.brokerAskList || [];
+        result.brokerBidList = result.brokerBidList || [];
+        result.sellList = result.brokerAskList;
+        result.buyList = result.brokerBidList;
+        callback(result);
+      });
     }
     /**
      * Qot_GetHistoryKL.proto协议返回对象
@@ -984,6 +1043,7 @@ var FutuQuant = function () {
   }, {
     key: 'qotGetHistoryKL',
     value: function qotGetHistoryKL(params) {
+      // 3100获取单只股票一段历史K线
       return this.socket.send('Qot_GetHistoryKL', Object.assign({
         rehabType: 1, // Qot_Common.RehabType,复权类型
         klType: 1, // Qot_Common.KLType,K线类型
@@ -1056,6 +1116,7 @@ var FutuQuant = function () {
   }, {
     key: 'qotGetHistoryKLPoints',
     value: function qotGetHistoryKLPoints(params) {
+      // 3101获取多只股票多点历史K线
       return this.socket.send('Qot_GetHistoryKLPoints', Object.assign({
         rehabType: 1, // Qot_Common.RehabType,复权类型
         klType: 1, // Qot_Common.KLType,K线类型
@@ -1124,6 +1185,7 @@ var FutuQuant = function () {
   }, {
     key: 'qotGetRehab',
     value: function qotGetRehab(securityList) {
+      // 3102获取复权信息
       return this.socket.send('Qot_GetRehab', {
         securityList: securityList
       });
@@ -1149,7 +1211,7 @@ var FutuQuant = function () {
       var market = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
       var beginTime = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '2018-01-01 00:00:00';
       var endTime = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '2018-02-01 00:00:00';
-
+      // 3200获取市场交易日
       return this.socket.send('Qot_GetTradeDate', {
         market: market,
         beginTime: beginTime,
@@ -1161,19 +1223,19 @@ var FutuQuant = function () {
      * @async
      * @param {QotMarket} market Qot_Common.QotMarket,股票市场
      * @param {SecurityType} secType Qot_Common.SecurityType,股票类型
-     * @returns {SecurityStaticInfo[]} staticInfoList 静态信息
+     * @returns {SecurityStaticInfo[]} 静态信息数组
      */
 
   }, {
     key: 'qotGetStaticInfo',
-    value: function qotGetStaticInfo() {
+    value: async function qotGetStaticInfo() {
       var market = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
       var secType = arguments[1];
-
-      return this.socket.send('Qot_GetStaticInfo', {
+      // 3202获取股票静态信息
+      return (await this.socket.send('Qot_GetStaticInfo', {
         market: market,
         secType: secType
-      });
+      })).staticInfoList;
     }
     /**
      * 正股类型额外数据
@@ -1246,10 +1308,18 @@ var FutuQuant = function () {
 
   }, {
     key: 'qotGetSecuritySnapShot',
-    value: function qotGetSecuritySnapShot(securityList) {
-      return this.socket.send('Qot_GetSecuritySnapshot', {
-        securityList: securityList
-      });
+    value: async function qotGetSecuritySnapShot(securityList) {
+      // 3203获取股票快照
+      var list = [].concat(securityList);
+      var result = [];
+      while (list.length) {
+        var res = (await this.socket.send('Qot_GetSecuritySnapshot', {
+          securityList: list.splice(-200)
+        })).snapshotList;
+        result = result.concat(res);
+        await sleep(1000 * 3);
+      }
+      return result;
     }
     /**
      * PlateInfo
@@ -1270,7 +1340,7 @@ var FutuQuant = function () {
     value: function qotGetPlateSet() {
       var market = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
       var plateSetType = arguments[1];
-
+      // 3204获取板块集合下的板块
       return this.socket.send('Qot_GetPlateSet', {
         market: market,
         plateSetType: plateSetType
@@ -1286,6 +1356,7 @@ var FutuQuant = function () {
   }, {
     key: 'qotGetPlateSecurity',
     value: function qotGetPlateSecurity(plate) {
+      // 3205获取板块下的股票
       return this.socket.send('Qot_GetPlateSecurity', {
         plate: plate
       });
@@ -1304,6 +1375,7 @@ var FutuQuant = function () {
       var userID = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.userID;
       var market = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
+      // 2001获取交易账户列表
       var _ref = await this.socket.send('Trd_GetAccList', {
         userID: userID
       }),
@@ -1312,6 +1384,10 @@ var FutuQuant = function () {
       return accList.filter(function (acc) {
         return acc.trdMarketAuthList.includes(market);
       });
+
+      // return this.socket.send('Trd_GetAccList', {
+      //   userID,
+      // });
     }
     /**
      * Trd_UnlockTrade.proto - 2005解锁或锁定交易
@@ -1331,10 +1407,11 @@ var FutuQuant = function () {
     value: function trdUnlockTrade() {
       var unlock = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
       var pwdMD5 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
+      // 2005解锁或锁定交易
+      if (pwdMD5) this.pwdMD5 = pwdMD5;
       return this.socket.send('Trd_UnlockTrade', {
         unlock: unlock,
-        pwdMD5: pwdMD5
+        pwdMD5: pwdMD5 || this.pwdMD5
       });
     }
     /**
@@ -1345,7 +1422,8 @@ var FutuQuant = function () {
 
   }, {
     key: 'trdSubAccPush',
-    value: function trdSubAccPush(accIDList) {
+    value: async function trdSubAccPush(accIDList) {
+      // 2008订阅接收交易账户的推送数据
       return this.socket.send('Trd_SubAccPush', {
         accIDList: accIDList
       });
@@ -1361,7 +1439,8 @@ var FutuQuant = function () {
     key: 'setCommonTradeHeader',
     value: function setCommonTradeHeader(trdEnv, accID) {
       var trdMarket = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-
+      // 设置交易模块的公共header，调用交易相关接口前必须先调用此接口。
+      this.market = trdMarket;
       this.trdHeader = {
         trdEnv: trdEnv,
         accID: accID,
@@ -1376,6 +1455,7 @@ var FutuQuant = function () {
   }, {
     key: 'trdGetFunds',
     value: async function trdGetFunds() {
+      // 2101获取账户资金
       if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
       return (await this.socket.send('Trd_GetFunds', {
         header: this.trdHeader
@@ -1393,6 +1473,7 @@ var FutuQuant = function () {
   }, {
     key: 'trdGetPositionList',
     value: async function trdGetPositionList(filterConditions, filterPLRatioMin, filterPLRatioMax) {
+      // 2102获取持仓列表
       if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
       return (await this.socket.send('Trd_GetPositionList', {
         header: this.trdHeader, // 交易公共参数头
@@ -1412,6 +1493,7 @@ var FutuQuant = function () {
   }, {
     key: 'trdGetOrderList',
     value: async function trdGetOrderList(filterConditions, filterStatusList) {
+      // 2201获取订单列表
       if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
       return (await this.socket.send('Trd_GetOrderList', {
         header: this.trdHeader, // 交易公共参数头
@@ -1445,6 +1527,7 @@ var FutuQuant = function () {
   }, {
     key: 'trdPlaceOrder',
     value: async function trdPlaceOrder(params) {
+      // 2202下单
       if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
       return (await this.socket.send('Trd_PlaceOrder', Object.assign({
         packetID: {
@@ -1461,6 +1544,78 @@ var FutuQuant = function () {
         adjustPrice: false, // 是否调整价格，如果价格不合法，是否调整到合法价位，true调整，false不调整
         adjustSideAndLimit: 0 // 调整方向和调整幅度百分比限制，正数代表向上调整，负数代表向下调整，具体值代表调整幅度限制，如：0.015代表向上调整且幅度不超过1.5%；-0.01代表向下调整且幅度不超过1%
       }, params))).orderID;
+    }
+    /**
+     * 2202市价下单，直到成功为止，返回买入/卖出的总价格
+     *
+     * @async
+     * @param {object} param
+     * @param {TrdSide} params.trdSide 交易方向, 参见Trd_Common.TrdSide的枚举定义
+     * @param {string} params.code 代码
+     * @param {number} params.qty 数量，2位精度，期权单位是"张"
+     * @returns {number} 卖出/买入总价
+     */
+
+  }, {
+    key: 'trdPlaceOrderMarket',
+    value: async function trdPlaceOrderMarket(param) {
+      var _this3 = this;
+
+      // 市价买入卖出
+      var trdSide = param.trdSide,
+          code = param.code,
+          qty = param.qty; // trdSide 1买入2卖出
+
+      var remainQty = qty;
+      var value = 0;
+
+      var _loop = async function _loop() {
+        var orderID = null;
+        var order = null;
+        var orderBooks = await _this3.qotGetOrderBook({ market: 1, code: code }); // 获取盘口
+        var price = trdSide === 1 ? orderBooks.sellList[0].price : orderBooks.buyList[0].price;
+        if (orderID && order.orderStatus === 10) {
+          await _this3.trdModifyOrder({ // 修改订单并设置订单为有效
+            modifyOrderOp: 4, orderID: orderID, price: price, qty: remainQty
+          });
+        } else if (!orderID) {
+          orderID = await _this3.trdPlaceOrder({
+            trdSide: trdSide, code: code, qty: remainQty, price: price
+          }); // 下单
+        }
+        // eslint-disable-next-line
+        while (true) {
+          // 确认了不传入过滤条件会返回所有订单
+          var list = await _this3.trdGetOrderList({}, []);
+          // eslint-disable-next-line
+          order = list.filter(function (item) {
+            return item.orderID === orderID;
+          });
+          if (order) {
+            if (order.orderStatus > 11) {
+              order = null;
+              orderID = null;
+              break;
+            } else if (order.orderStatus < 10) {
+              await sleep(50);
+            } else if (order.fillQty > 0) {
+              remainQty -= order.fillQty;
+              value += order.price * order.fillQty;
+              if (remainQty > 0 && order.orderStatus === 10) {
+                // 部分成交，先设置为失效
+                await _this3.trdModifyOrder({ modifyOrderOp: 3, orderID: orderID }); // 失效
+              }
+            }
+          } else {
+            await sleep(60);
+          }
+        }
+      };
+
+      while (remainQty > 0) {
+        await _loop();
+      }
+      return value;
     }
     /**
      * Trd_ModifyOrder.proto - 2205修改订单(改价、改量、改状态等)
@@ -1488,6 +1643,7 @@ var FutuQuant = function () {
   }, {
     key: 'trdModifyOrder',
     value: async function trdModifyOrder(params) {
+      // 2205修改订单(改价、改量、改状态等)
       if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
       return (await this.socket.send('Trd_ModifyOrder', Object.assign({
         packetID: {
@@ -1515,10 +1671,23 @@ var FutuQuant = function () {
 
   }, {
     key: 'subTrdUpdateOrder',
-    value: function subTrdUpdateOrder(callback) {
+    value: async function subTrdUpdateOrder(callback) {
+      // 注册订单更新通知
       return this.socket.subNotify(2208, function (data) {
         return callback(data.order);
       });
+    }
+    /**
+    * 取消注册订单更新通知
+    * Trd_UpdateOrder.proto - 2208推送订单更新
+    * @async
+    */
+
+  }, {
+    key: 'unsubTrdUpdateOrder',
+    value: async function unsubTrdUpdateOrder() {
+      // 取消注册订单更新通知
+      return this.socket.unsubNotify(2208);
     }
     /**
      * Trd_GetOrderFillList.proto - 2211获取成交列表
@@ -1530,6 +1699,7 @@ var FutuQuant = function () {
   }, {
     key: 'trdGetOrderFillList',
     value: async function trdGetOrderFillList(filterConditions) {
+      // 2211获取成交列表
       if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
       return (await this.socket.send('Trd_GetOrderFillList', {
         header: this.trdHeader, // 交易公共参数头
@@ -1545,7 +1715,8 @@ var FutuQuant = function () {
 
   }, {
     key: 'subTrdUpdateOrderFill',
-    value: function subTrdUpdateOrderFill(callback) {
+    value: async function subTrdUpdateOrderFill(callback) {
+      // 注册新成交通知
       return this.socket.subNotify(2218, function (data) {
         return callback(data.orderFill);
       });
@@ -1567,6 +1738,7 @@ var FutuQuant = function () {
   }, {
     key: 'trdGetHistoryOrderList',
     value: async function trdGetHistoryOrderList(filterConditions, filterStatusList) {
+      // 2221获取历史订单列表
       if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
       return (await this.socket.send('Trd_GetHistoryOrderList', {
         header: this.trdHeader, // 交易公共参数头
@@ -1589,6 +1761,7 @@ var FutuQuant = function () {
   }, {
     key: 'trdGetHistoryOrderFillList',
     value: async function trdGetHistoryOrderFillList(filterConditions) {
+      // 2222获取历史成交列表
       if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
       return (await this.socket.send('Trd_GetHistoryOrderFillList', {
         header: this.trdHeader, // 交易公共参数头

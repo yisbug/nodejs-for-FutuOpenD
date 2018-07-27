@@ -258,7 +258,7 @@ var Socket = function () {
         _this3.cacheResponseCallback[requestId] = function (responseBuffer) {
           var result = response.decode(responseBuffer).toJSON();
           if (result.retType === 0) return resolve(result.s2c);
-          var errMsg = '\u670D\u52A1\u5668\u8FD4\u56DE\u7ED3\u679C\u5931\u8D25,request:' + protoName + '(' + protoId + '),reqId:' + requestId + ',errMsg:' + result.retMsg;
+          var errMsg = '\u670D\u52A1\u5668\u8FD4\u56DE\u7ED3\u679C\u5931\u8D25,request:' + protoName + '(' + protoId + '),retType:' + result.retType + ',reqId:' + requestId + ',errMsg:' + result.retMsg;
           _this3.logger.error(errMsg);
           return reject(new Error(errMsg));
         };

@@ -207,7 +207,7 @@ class Socket {
       this.cacheResponseCallback[requestId] = (responseBuffer) => {
         const result = response.decode(responseBuffer).toJSON();
         if (result.retType === 0) return resolve(result.s2c);
-        const errMsg = `服务器返回结果失败,request:${protoName}(${protoId}),reqId:${requestId},errMsg:${result.retMsg}`;
+        const errMsg = `服务器返回结果失败,request:${protoName}(${protoId}),retType:${result.retType},reqId:${requestId},errMsg:${result.retMsg}`;
         this.logger.error(errMsg);
         return reject(new Error(errMsg));
       };

@@ -1,3 +1,20 @@
+### 0.2.0
+
+2017.07.27
+
+* fix: 优化自定义logger部分
+* feature: 修改qotGetBasicQot方法直接返回数组
+* feature: 修改qotGetOrderBook方法直接返回对象，并增加sellList和buyList两个字段，等同于orderBookAskList和orderBookBidList
+* feature: 修改subQotUpdateOrderBook事件传递的摆盘结果，增加sellList和buyList两个字段，等同于orderBookAskList和orderBookBidList
+* feature: 修改qotGetBroker方法返回结果，增加sellList和buyList两个字段，等同于brokerAskList和brokerBidList
+* feature: 修改subQotUpdateBroker方法事件传递的经纪队列，增加sellList和buyList两个字段，等同于brokerAskList和brokerBidList
+* feature: 修改qotGetStaticInfo返回结果，直接返回数组
+* feature: 修改qotGetSecuritySnapShot返回结果，直接返回数组，并支持超过200支以上股票的查询。
+* feature: 新增按市价下单接口：trdPlaceOrderMarket(param)，直到交易完成成功为止，返回买入/卖出总价
+* feature: 新增取消注册订单更新接口：unsubTrdUpdateOrder()
+* docs: 其他调整
+
+
 ### 0.1.3
 
 * feature: 支持自定义日志
