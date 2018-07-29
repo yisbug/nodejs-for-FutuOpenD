@@ -21,26 +21,21 @@ var _protobufjs = require('protobufjs');
 
 var _protobufjs2 = _interopRequireDefault(_protobufjs);
 
-var _path = require('path');
+var _hexSha = require('hex-sha1');
 
-var _path2 = _interopRequireDefault(_path);
-
-var _crypto = require('crypto');
-
-var _crypto2 = _interopRequireDefault(_crypto);
+var _hexSha2 = _interopRequireDefault(_hexSha);
 
 var _protoid = require('./protoid');
 
 var _protoid2 = _interopRequireDefault(_protoid);
 
+var _pb = require('./pb.json');
+
+var _pb2 = _interopRequireDefault(_pb);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var FILENAME = typeof __filename !== 'undefined' ? __filename : (/^ +at (?:file:\/*(?=\/)|)(.*?):\d+:\d+$/m.exec(Error().stack) || '')[1];
-var DIRARR = FILENAME.split('/');
-DIRARR.pop();
-var DIRNAME = typeof __dirname !== 'undefined' ? __dirname : DIRARR.join('/');
 
 var ProtoName = {};
 Object.keys(_protoid2.default).forEach(function (key) {
@@ -102,6 +97,8 @@ var Socket = function () {
      * @type {number}
      */
     this.requestId = 1000; // 请求序列号，自增
+
+    this.root = _protobufjs2.default.Root.fromJSON(_pb2.default);
 
     this.cacheResponseCallback = {}; // 缓存的回调函数
     this.cacheNotifyCallback = {}; // 缓存的通知回调函数
@@ -216,7 +213,7 @@ var Socket = function () {
 
   }, {
     key: 'send',
-    value: function send(protoName, message) {
+    value: async function send(protoName, message) {
       var _this3 = this;
 
       if (!this.isConnect) return this.logger.warn(this.name + ' \u5C1A\u672A\u8FDE\u63A5\uFF0C\u65E0\u6CD5\u53D1\u9001\u8BF7\u6C42\u3002');
@@ -228,16 +225,15 @@ var Socket = function () {
 
       this.requestId += 1;
 
-      // 加载proto协议文件
-      var root = _protobufjs2.default.loadSync(_path2.default.join(DIRNAME, 'pb/' + protoName + '.proto'));
-      var request = root.lookup(protoName + '.Request');
-      var response = root.lookup(protoName + '.Response');
+      // const root = protobufjs.loadSync(path.join(DIRNAME, `pb/${protoName}.proto`));
+      var request = this.root[protoName].Request;
+      var response = this.root[protoName].Response;
 
       // 处理请求数据
       var reqBuffer = request.encode(request.create({
         c2s: message
       })).finish();
-      var sha1 = _crypto2.default.createHash('sha1').update(reqBuffer).digest('hex');
+      var sha1 = (0, _hexSha2.default)(reqBuffer);
       var sha1Buffer = new Uint8Array(20).map(function (item, index) {
         return Number('0x' + sha1.substr(index * 2, 2));
       });
@@ -313,7 +309,8 @@ var Socket = function () {
         bodyBuffer = this.recvBuffer.slice(44, bodyLen + headerLen);
         this.recvBuffer = this.recvBuffer.slice(bodyLen + headerLen);
 
-        var sha1 = _crypto2.default.createHash('sha1').update(bodyBuffer).digest('hex');
+        // const sha1 = crypto.createHash('sha1').update(bodyBuffer).digest('hex');
+        var sha1 = (0, _hexSha2.default)(bodyBuffer);
         if (sha1 !== bodySha1) {
           throw new Error('\u63A5\u6536\u7684\u5305\u4F53sha1\u52A0\u5BC6\u9519\u8BEF\uFF1A' + bodySha1 + ',\u672C\u5730sha1\uFF1A' + sha1);
         }
@@ -327,8 +324,7 @@ var Socket = function () {
           try {
             // 加载proto协议文件
             var protoName = ProtoName[protoId];
-            var root = _protobufjs2.default.loadSync(_path2.default.join(DIRNAME, 'pb/' + protoName + '.proto'));
-            var response = root.lookup(protoName + '.Response');
+            var response = this.root[protoName].Response;
             var result = response.decode(bodyBuffer).toJSON();
             this.cacheNotifyCallback[protoId](result.s2c);
           } catch (e) {

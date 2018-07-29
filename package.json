@@ -8,7 +8,8 @@
     "doc": "rm -rf doc && jsdoc -c jsdoc.json -t ./node_modules/ink-docstrap/template",
     "build": "babel src/*.mjs -d .",
     "demo-es6": "node --experimental-modules demo.mjs",
-    "demo-es5": "node demo.js"
+    "demo-es5": "node demo.js",
+    "pb": "pbjs -t json src/pb/*.proto > src/pb.json"
   },
   "repository": {
     "type": "git",
@@ -21,8 +22,10 @@
   },
   "homepage": "https://github.com/yisbug/futuquant#readme",
   "dependencies": {
+    "buffer": "^5.2.0",
     "bunyan": "^1.8.12",
     "bunyan-debug-stream": "^1.0.8",
+    "hex-sha1": "^1.0.2",
     "protobufjs": "^6.8.6"
   },
   "devDependencies": {
