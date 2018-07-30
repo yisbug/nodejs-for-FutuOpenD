@@ -36,7 +36,7 @@ describe('FtQuant', () => {
 
   it('qotGetStaticInfo', async () => {
     const res = await ft.qotGetStaticInfo(1, 5); // 获取涡轮
-    res.staticInfoList.length.should.be.above(100);
+    res.length.should.be.above(100);
   });
 
   it('trdUnlockTrade', async () => {

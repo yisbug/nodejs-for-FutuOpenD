@@ -9,15 +9,9 @@
 
 import net from 'net';
 import protobufjs from 'protobufjs';
-import path from 'path';
-import crypto from 'crypto';
-import logger from './logger';
+import hexSha1 from 'hex-sha1';
 import ProtoId from './protoid';
-
-const FILENAME = typeof __filename !== 'undefined' ? __filename : (/^ +at (?:file:\/*(?=\/)|)(.*?):\d+:\d+$/m.exec(Error().stack) || '')[1];
-const DIRARR = FILENAME.split('/');
-DIRARR.pop();
-const DIRNAME = typeof __dirname !== 'undefined' ? __dirname : DIRARR.join('/');
+import Pb from './pb.json';
 
 const ProtoName = {};
 Object.keys(ProtoId).forEach((key) => {
@@ -35,8 +29,9 @@ class Socket {
    * Creates an instance of Socket.
    * @param {string} ip OpenD服务Ip
    * @param {number} port OpenD服务端口
+   * @param {object} logger 日志对象
    */
-  constructor(ip, port) {
+  constructor(ip, port, logger) {
     /**
      * OpenD服务IP
      * @type {string}
@@ -47,6 +42,11 @@ class Socket {
      * @type {number}
      */
     this.port = port;
+    /**
+     * 日志对象
+     * @type {object}
+     */
+    this.logger = logger;
 
     id += 1;
     /**
@@ -70,6 +70,8 @@ class Socket {
      */
     this.requestId = 1000; // 请求序列号，自增
 
+    this.root = protobufjs.Root.fromJSON(Pb);
+
     this.cacheResponseCallback = {}; // 缓存的回调函数
     this.cacheNotifyCallback = {}; // 缓存的通知回调函数
     this.header = null; // 缓存接收的数据包头
@@ -78,19 +80,19 @@ class Socket {
     this.socket = new net.Socket();
     this.socket.setKeepAlive(true);
     this.socket.on('error', (data) => {
-      logger.error(`${this.name} on error: ${data}`);
+      this.logger.error(`${this.name} on error: ${data}`);
       this.socket.destroy();
       this.isConnect = false;
     });
     this.socket.on('timeout', (e) => {
-      logger.error(`${this.name} on timeout.`, e);
+      this.logger.error(`${this.name} on timeout.`, e);
       this.socket.destroy();
       this.isConnect = false;
     });
     // 为客户端添加“close”事件处理函数
     this.socket.on('close', () => {
       const errMsg = `${this.name} on closed and retry connect on 5 seconds.`;
-      logger.error(errMsg);
+      this.logger.error(errMsg);
       this.isConnect = false;
       // 5s后重连
       if (this.timerRecontent) return;
@@ -122,7 +124,7 @@ class Socket {
         host: this.ip,
         timeout: 1000 * 30,
       }, async () => {
-        logger.debug(`${this.name} connect success:${this.ip}:${this.port}`);
+        this.logger.debug(`${this.name} connect success:${this.ip}:${this.port}`);
         this.isConnect = true;
         if (typeof this.connectCallback === 'function') this.connectCallback();
         resolve();
@@ -164,28 +166,24 @@ class Socket {
    * @param {object} message 要发送的数据
    */
   send(protoName, message) {
-    if (!this.isConnect) return logger.warn(`${this.name} 尚未连接，无法发送请求。`);
+    if (!this.isConnect) return this.logger.warn(`${this.name} 尚未连接，无法发送请求。`);
     const protoId = ProtoId[protoName];
-    if (!protoId) return logger.warn(`找不到对应的协议Id:${protoName}`);
+    if (!protoId) return this.logger.warn(`找不到对应的协议Id:${protoName}`);
     // 请求序列号，自增
     if (this.requestId > 1000000) this.requestId = 1000;
-    const {
-      requestId,
-    } = this;
+    const { requestId } = this;
     this.requestId += 1;
 
-    // 加载proto协议文件
-    const root = protobufjs.loadSync(path.join(DIRNAME, `pb/${protoName}.proto`));
-    const request = root.lookup(`${protoName}.Request`);
-    const response = root.lookup(`${protoName}.Response`);
+    const request = this.root[protoName].Request;
+    const response = this.root[protoName].Response;
 
     // 处理请求数据
     const reqBuffer = request.encode(request.create({
       c2s: message,
     })).finish();
-    const sha1 = crypto.createHash('sha1').update(reqBuffer).digest('hex');
+    const sha1 = hexSha1(reqBuffer);
     const sha1Buffer = new Uint8Array(20).map((item, index) => Number(`0x${sha1.substr(index * 2, 2)}`));
-    logger.debug(`request:${protoName}(${protoId}),reqId:${requestId}`);
+    this.logger.debug(`request:${protoName}(${protoId}),reqId:${requestId}`);
     // 处理包头
     const buffer = Buffer.concat([
       Buffer.from('FT'), // 包头起始标志，固定为“FT”
@@ -204,8 +202,8 @@ class Socket {
       this.cacheResponseCallback[requestId] = (responseBuffer) => {
         const result = response.decode(responseBuffer).toJSON();
         if (result.retType === 0) return resolve(result.s2c);
-        const errMsg = `服务器返回结果失败,request:${protoName}(${protoId}),reqId:${requestId},errMsg:${result.retMsg}`;
-        logger.error(errMsg);
+        const errMsg = `服务器返回结果失败,request:${protoName}(${protoId}),retType:${result.retType},reqId:${requestId},errMsg:${result.retMsg}`;
+        this.logger.error(errMsg);
         return reject(new Error(errMsg));
       };
     });
@@ -240,7 +238,7 @@ class Socket {
         arrReserved: this.recvBuffer.slice(36, 44), // 保留8字节扩展
       };
       if (this.header.szHeaderFlag !== 'FT') throw new Error('接收的包头数据格式错误');
-      logger.debug(`response:${ProtoName[this.header.nProtoID]}(${this.header.nProtoID}),reqId:${this.header.nSerialNo},bodyLen:${bodyLen}`);
+      this.logger.debug(`response:${ProtoName[this.header.nProtoID]}(${this.header.nProtoID}),reqId:${this.header.nSerialNo},bodyLen:${bodyLen}`);
     }
 
     // 已经接收指定包体长度的全部数据，切割包体buffer
@@ -254,7 +252,7 @@ class Socket {
       bodyBuffer = this.recvBuffer.slice(44, bodyLen + headerLen);
       this.recvBuffer = this.recvBuffer.slice(bodyLen + headerLen);
 
-      const sha1 = crypto.createHash('sha1').update(bodyBuffer).digest('hex');
+      const sha1 = hexSha1(bodyBuffer);
       if (sha1 !== bodySha1) {
         throw new Error(`接收的包体sha1加密错误：${bodySha1},本地sha1：${sha1}`);
       }
@@ -268,13 +266,12 @@ class Socket {
         try {
           // 加载proto协议文件
           const protoName = ProtoName[protoId];
-          const root = protobufjs.loadSync(path.join(DIRNAME, `pb/${protoName}.proto`));
-          const response = root.lookup(`${protoName}.Response`);
+          const response = this.root[protoName].Response;
           const result = response.decode(bodyBuffer).toJSON();
           this.cacheNotifyCallback[protoId](result.s2c);
         } catch (e) {
           const errMsg = `通知回调执行错误，response:${ProtoName[protoId]}(${protoId}),reqId:${reqId},bodyLen:${bodyLen}，堆栈：${e.stack}`;
-          logger.error(errMsg);
+          this.logger.error(errMsg);
           throw new Error(errMsg);
         }
       }
