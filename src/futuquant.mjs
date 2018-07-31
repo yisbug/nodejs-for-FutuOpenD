@@ -715,12 +715,6 @@ class FutuQuant {
     return this.socket.subNotify(3005, data => callback(data.basicQotList));
   }
   /**
-   * Qot_GetKL.proto协议返回对象
-   * @typedef QotGetKLResponse
-   * @property {Security} security 股票
-   * @property {KLine[]} klList k线点
-   */
-  /**
    * Qot_GetKL.proto - 3006获取K线
    *
     复权类型参考 RehabType
@@ -734,15 +728,15 @@ class FutuQuant {
    * @param {Security} params.security 股票
    * @param {number} params.reqNum 请求K线根数
    * @async
-   * @returns {QotGetKLResponse}
+   * @returns {KLine[]} k线点
    */
-  qotGetKL(params) { // 3006获取K线
-    return this.socket.send('Qot_GetKL', Object.assign({
+  async qotGetKL(params) { // 3006获取K线
+    return (await this.socket.send('Qot_GetKL', Object.assign({
       rehabType: 1, // Qot_Common.RehabType,复权类型
       klType: 1, // Qot_Common.KLType,K线类型
       security: {}, // 股票
       reqNum: 60, // 请求K线根数
-    }, params));
+    }, params))).klList;
   }
   /**
    * Qot_UpdateKL.proto协议返回对象
@@ -756,10 +750,10 @@ class FutuQuant {
    * 注册K线推送，需要先调用订阅接口
    * Qot_UpdateKL.proto - 3007推送K线
    * @async
-   * @returns {QotUpdateKLResponse}
+   * @returns {KLine[]} 推送的k线点
    */
   subQotUpdateKL(callback) { // 注册K线推送
-    return this.socket.subNotify(3007, callback);
+    return this.socket.subNotify(3007, data => callback(data.klList));
   }
   /**
    * Qot_GetRT.proto协议返回对象

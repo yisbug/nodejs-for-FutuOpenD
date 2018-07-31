@@ -1,15 +1,17 @@
 {
   "name": "futuquant",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "FutuQuant-Nodejs",
   "main": "src/futuquant.js",
   "scripts": {
     "test": "mocha -r esm -t 600000 -b -w test/*",
+    "test1": "mocha -r esm -t 600000 -b ",
     "doc": "rm -rf doc && jsdoc -c jsdoc.json -t ./node_modules/ink-docstrap/template",
     "build": "babel src/*.mjs -d .",
     "demo-es6": "node --experimental-modules demo.mjs",
     "demo-es5": "node demo.js",
-    "pb": "pbjs -t json src/pb/*.proto > src/pb.json"
+    "pb": "pbjs -t json src/pb/*.proto > src/pb.json",
+    "pub":"npm run pb && npm run build && npm run doc && npm publish"
   },
   "repository": {
     "type": "git",

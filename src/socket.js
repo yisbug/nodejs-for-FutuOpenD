@@ -213,7 +213,7 @@ var Socket = function () {
 
   }, {
     key: 'send',
-    value: async function send(protoName, message) {
+    value: function send(protoName, message) {
       var _this3 = this;
 
       if (!this.isConnect) return this.logger.warn(this.name + ' \u5C1A\u672A\u8FDE\u63A5\uFF0C\u65E0\u6CD5\u53D1\u9001\u8BF7\u6C42\u3002');
@@ -225,7 +225,6 @@ var Socket = function () {
 
       this.requestId += 1;
 
-      // const root = protobufjs.loadSync(path.join(DIRNAME, `pb/${protoName}.proto`));
       var request = this.root[protoName].Request;
       var response = this.root[protoName].Response;
 
@@ -309,7 +308,6 @@ var Socket = function () {
         bodyBuffer = this.recvBuffer.slice(44, bodyLen + headerLen);
         this.recvBuffer = this.recvBuffer.slice(bodyLen + headerLen);
 
-        // const sha1 = crypto.createHash('sha1').update(bodyBuffer).digest('hex');
         var sha1 = (0, _hexSha2.default)(bodyBuffer);
         if (sha1 !== bodySha1) {
           throw new Error('\u63A5\u6536\u7684\u5305\u4F53sha1\u52A0\u5BC6\u9519\u8BEF\uFF1A' + bodySha1 + ',\u672C\u5730sha1\uFF1A' + sha1);
