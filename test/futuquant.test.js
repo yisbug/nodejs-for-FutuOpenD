@@ -4,12 +4,8 @@ import path from 'path';
 import fs from 'fs';
 import FtQuant from '../src/futuquant';
 
-const FILENAME = typeof __filename !== 'undefined' ? __filename : (/^ +at (?:file:\/*(?=\/)|)(.*?):\d+:\d+$/m.exec(Error().stack) || '')[1];
-const DIRARR = FILENAME.split('/');
-DIRARR.pop();
-const DIRNAME = typeof __dirname !== 'undefined' ? __dirname : DIRARR.join('/');
 
-const FutuOpenDXMLPath = path.join(DIRNAME, '../../FutuOpenD_1.01_Mac/FutuOpenD.xml');
+const FutuOpenDXMLPath = path.join(__dirname, '../../FutuOpenD_1.01_Mac/FutuOpenD.xml');
 const ftOpenDConfig = fs.readFileSync(FutuOpenDXMLPath, { encoding: 'utf8' });
 const userID = ftOpenDConfig.match(/login_account>(\d*?)<\/login_account/)[1];
 const pwdMd5 = ftOpenDConfig.match(/trade_pwd_md5>(.*?)<\/trade_pwd_md5/)[1];

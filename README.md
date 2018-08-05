@@ -8,12 +8,12 @@
 
 * 最新版本使用了babel编译，可以直接使用`require('futuquant')`或者`import FtQuant from 'futuquant'`语法。
 
-* 使用了async/await语法，要求nodejs版本v7.10.1以上，v7.5.1可以使用`--harmony`或者`--harmony-async-await`参数开启async/await的支持。
+* 使用了async/await语法，要求nodejs版本v7.10.1以上，v7.5.1以上可以使用`--harmony`或者`--harmony-async-await`参数开启async/await的支持，v7.6.x 以可以不用开启 flag 直接使用。。
 * 底层协议基于FutuQuant v3.1.2，参考：[FutunnOpen/futuquant](https://github.com/FutunnOpen/futuquant/)。
 * 数据传输格式只支持protobuf。
-* API文档相关：[https://yisbug.github.io/futuquant/doc/index.html](https://yisbug.github.io/futuquant/doc/index.html)
+* API文档相关：[https://yisbug.github.io/nodejs-for-FutuOpenD/doc/index.html](https://yisbug.github.io/nodejs-for-FutuOpenD/doc/index.html)
 
-> 为了方便使用，请注意部分接口参数及返回结果和富途官方版本不完全一致，详细请参考[API文档](https://yisbug.github.io/futuquant/doc/index.html)。
+> 为了方便使用，请注意部分接口参数及返回结果和富途官方版本不完全一致，详细请参考[API文档](https://yisbug.github.io/nodejs-for-FutuOpenD/doc/index.html)。
 
 ### 更新
 
@@ -56,12 +56,7 @@ const bunyan = require('bunyan');
 const bunyanDebugStream = require('bunyan-debug-stream');
 const path = require('path');
 
-const FILENAME = typeof __filename !== 'undefined' ? __filename : (/^ +at (?:file:\/*(?=\/)|)(.*?):\d+:\d+$/m.exec(Error().stack) || '')[1];
-const DIRARR = FILENAME.split('/');
-DIRARR.pop();
-const DIRNAME = typeof __dirname !== 'undefined' ? __dirname : DIRARR.join('/');
-
-const FutuOpenDXMLPath = path.join(DIRNAME, '../FutuOpenD_1.01_Mac/FutuOpenD.xml');
+const FutuOpenDXMLPath = path.join(__dirname, '../FutuOpenD_1.01_Mac/FutuOpenD.xml');
 const ftOpenDConfig = fs.readFileSync(FutuOpenDXMLPath, {
   encoding: 'utf8'
 });
