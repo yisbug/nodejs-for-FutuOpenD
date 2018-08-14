@@ -6,7 +6,7 @@
     "exclude": [
       "node_modules"
     ],
-    "includePattern": ".+\\.mjs(doc|x)?$"
+    "includePattern": ".+\\.js(doc|x)?$"
   },
   "opts": {
     "destination": "doc",

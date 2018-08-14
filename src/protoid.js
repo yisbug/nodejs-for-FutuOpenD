@@ -1,9 +1,4 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = {
+module.exports = {
   InitConnect: 1001, // 初始化连接
   GetGlobalState: 1002, // 获取全局状态
   Notify: 1003, // 通知推送
@@ -26,6 +21,7 @@ exports.default = {
 
   Trd_GetHistoryOrderList: 2221, // 获取历史订单列表
   Trd_GetHistoryOrderFillList: 2222, // 获取历史成交列表
+  Trd_GetMaxTrdQtys: 2111, // 查询最大买卖数量
 
   // 订阅数据
   Qot_Sub: 3001, // 订阅或者反订阅
@@ -55,6 +51,6 @@ exports.default = {
   Qot_GetStaticInfo: 3202, // 获取股票列表
   Qot_GetSecuritySnapshot: 3203, // 获取股票快照
   Qot_GetPlateSet: 3204, // 获取板块集合下的板块
-  Qot_GetPlateSecurity: 3205 // 获取板块下的股票
+  Qot_GetPlateSecurity: 3205, // 获取板块下的股票
+  Qot_GetReference: 3206, // 获取正股相关股票，暂时只有窝轮
 };
-module.exports = exports["default"];

@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>FutuQuant-Nodejs Source: futuquant.mjs</title>
+	<title>FutuQuant-Nodejs Source: futuquant.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -40,7 +40,7 @@
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="global.html#result">result</a></li>
+					<li><a href="global.html">Global</a></li>
 				</ul>
 			</li>
 			
@@ -72,14 +72,14 @@
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: futuquant.mjs</h1>
+		<h1 class="page-title">Source: futuquant.js</h1>
     
 <section>
     <article>
         <pre
-            class="sunlight-highlight-javascript linenums">import bunyan from 'bunyan';
-import bunyanDebugStream from 'bunyan-debug-stream';
-import Socket from './socket';
+            class="sunlight-highlight-javascript linenums">const bunyan = require('bunyan');
+const bunyanDebugStream = require('bunyan-debug-stream');
+const Socket = require('./socket');
 
 const sleep = async time => new Promise((resolve) => {
   setTimeout(resolve, time);
@@ -539,6 +539,16 @@ const sleep = async time => new Promise((resolve) => {
  * @property {string} [counterBrokerName] 对手经纪名称，港股有效
  */
 /**
+ * 最大交易数量
+ * @description 因目前服务器实现的问题，卖空需要先卖掉持仓才能再卖空，是分开两步卖的，买回来同样是逆向两步；而看多的买是可以现金加融资一起一步买的，请注意这个差异
+ * @typedef {object} MaxTrdQtys
+ * @property {number} maxCashBuy 不使用融资，仅自己的现金最大可买整手股数
+ * @property {number} [maxCashAndMarginBuy] 使用融资，自己的现金 + 融资资金总共的最大可买整手股数
+ * @property {number} maxPositionSell 不使用融券(卖空)，仅自己的持仓最大可卖整手股数
+ * @property {number} [maxSellShort] 使用融券(卖空)，最大可卖空整手股数，不包括多仓
+ * @property {number} [maxBuyBack] 卖空后，需要买回的最大整手股数。因为卖空后，必须先买回已卖空的股数，还掉股票，才能再继续买多。
+ */
+/**
  * 过滤条件，条件组合是"与"不是"或"，用于获取订单、成交、持仓等时二次过滤
  * @typedef {object} TrdFilterConditions
  * @property {string[]} codeList 代码过滤，只返回包含这些代码的数据，没传不过滤
@@ -815,7 +825,7 @@ class FutuQuant {
       klType: 1, // Qot_Common.KLType,K线类型
       security: {}, // 股票
       reqNum: 60, // 请求K线根数
-    }, params))).klList;
+    }, params))).klList || [];
   }
   /**
    * Qot_UpdateKL.proto协议返回对象
@@ -832,40 +842,28 @@ class FutuQuant {
    * @returns {KLine[]} 推送的k线点
    */
   subQotUpdateKL(callback) { // 注册K线推送
-    return this.socket.subNotify(3007, data => callback(data.klList));
+    return this.socket.subNotify(3007, data => callback(data.klList || []));
   }
-  /**
-   * Qot_GetRT.proto协议返回对象
-   * @typedef QotGetRTResponse
-   * @property {Security} security 股票
-   * @property {TimeShare[]} rtList 分时点
-   */
   /**
    * Qot_GetRT.proto - 3008获取分时
    * @async
    * @param {Security} security 股票
-   * @returns {QotGetRTResponse}
+   * @returns {TimeShare[]} 分时点
    */
-  qotGetRT(security) { // 获取分时
-    return this.socket.send('Qot_GetRT', {
+  async qotGetRT(security) { // 获取分时
+    return (await this.socket.send('Qot_GetRT', {
       security,
-    });
+    })).rtList || [];
   }
   /**
    * 注册分时推送，需要先调用订阅接口
    * Qot_UpdateRT.proto - 3009推送分时
    * @async
-   * @returns {QotGetRTResponse}
+   * @returns {TimeShare[]} 分时点
    */
   subQotUpdateRT(callback) { // 注册分时推送
-    return this.socket.subNotify(3009, callback);
+    return this.socket.subNotify(3009, data => callback(data.rtList || []));
   }
-  /**
-   * Qot_GetTicker.proto协议返回对象
-   * @typedef QotGetTickerResponse
-   * @property {Security} security 股票
-   * @property {Ticker[]} tickerList 逐笔
-   */
   /**
    * Qot_GetTicker.proto - 3010获取逐笔
    *
@@ -874,31 +872,33 @@ class FutuQuant {
     请求逐笔目前最多最近1000个
    * @param {Security} security 股票
    * @param {number} maxRetNum 最多返回的逐笔个数,实际返回数量不一定会返回这么多,最多返回1000个，默认100
-   * @returns {QotGetTickerResponse}
+   * @returns {Ticker[]} 逐笔
    * @async
    */
-  qotGetTicker(security, maxRetNum = 100) { // 3010获取逐笔
-    return this.socket.send('Qot_GetTicker', {
+  async qotGetTicker(security, maxRetNum = 100) { // 3010获取逐笔
+    return (await this.socket.send('Qot_GetTicker', {
       security,
       maxRetNum,
-    });
+    })).tickerList || [];
   }
   /**
    * 注册逐笔推送，需要先调用订阅接口
    * Qot_UpdateTicker.proto - 3011推送逐笔
    * @async
    * @param {function} callback  回调
-   * @returns {QotGetTickerResponse}
+   * @returns {Ticker[]} 逐笔
    */
   subQotUpdateTicker(callback) { // 注册逐笔推送
-    return this.socket.subNotify(3011, callback);
+    return this.socket.subNotify(3011, data => callback(data.tickerList || []));
   }
   /**
    * Qot_GetOrderBook.proto协议返回对象
    * @typedef QotGetOrderBookResponse
    * @property {Security} security 股票
    * @property {OrderBook[]} orderBookAskList 卖盘
+   * @property {OrderBook[]} sellList 卖盘，同orderBookAskList
    * @property {OrderBook[]} orderBookBidList 买盘
+   * @property {OrderBook[]} buyList 买盘，同orderBookBidList
    */
   /**
    * Qot_GetOrderBook.proto - 3012获取买卖盘，需要先调用订阅接口
@@ -925,7 +925,7 @@ class FutuQuant {
    * Qot_UpdateOrderBook.proto - 3013推送买卖盘
    * @async
    * @param {function} callback 回调
-   * @const result = await s {QotGetOrderBookResponse}
+   * @const {QotGetOrderBookResponse}
    */
   subQotUpdateOrderBook(callback) { // 注册买卖盘推送
     return this.socket.subNotify(3013, (data) => {
@@ -941,7 +941,9 @@ class FutuQuant {
    * @typedef QotGetBrokerResponse
    * @property {Security} security 股票
    * @property {Broker[]} brokerAskList 经纪Ask(卖)盘
+   * @property {Broker[]} sellList 经纪Ask(卖)盘，同brokerAskList
    * @property {Broker[]} brokerBidList 经纪Bid(买)盘
+   * @property {Broker[]} buyList 经纪Bid(买)盘，同brokerBidList
    */
   /**
    * Qot_GetBroker.proto - 3014获取经纪队列
@@ -976,13 +978,6 @@ class FutuQuant {
     });
   }
   /**
-   * Qot_GetHistoryKL.proto协议返回对象
-   * @typedef QotGetHistoryKLResponse
-   * @property {Security} security 股票
-   * @property {KLine[]} klList K线数据
-   * @property {string} nextKLTime 如请求不指定maxAckKLNum值，则不会返回该字段，该字段表示超过指定限制的下一K线时间字符串
-   */
-  /**
    * Qot_GetHistoryKL.proto - 3100获取单只股票一段历史K线
    * @async
    * @param {object} params
@@ -993,10 +988,10 @@ class FutuQuant {
    * @param {string} params.endTime 结束时间字符串
    * @param {number} [params.maxAckKLNum] 最多返回多少根K线，如果未指定表示不限制
    * @param {number} [params.needKLFieldsFlag] 指定返回K线结构体特定某几项数据，KLFields枚举值或组合，如果未指定返回全部字段
-   * @returns {QotGetHistoryKLResponse}
+   * @returns {KLine[]}
    */
-  qotGetHistoryKL(params) { // 3100获取单只股票一段历史K线
-    return this.socket.send('Qot_GetHistoryKL', Object.assign({
+  async qotGetHistoryKL(params) { // 3100获取单只股票一段历史K线
+    return (await this.socket.send('Qot_GetHistoryKL', Object.assign({
       rehabType: 1, // Qot_Common.RehabType,复权类型
       klType: 1, // Qot_Common.KLType,K线类型
       security: {}, // 股票市场以及股票代码
@@ -1004,7 +999,7 @@ class FutuQuant {
       endTime: '', // 结束时间字符串
       maxAckKLNum: 60, // 最多返回多少根K线，如果未指定表示不限制
       needKLFieldsFlag: 512, // 指定返回K线结构体特定某几项数据，KLFields枚举值或组合，如果未指定返回全部字段
-    }, params));
+    }, params))).klList || [];
   }
   /**
    * 当请求时间点数据为空时，如何返回数据
@@ -1039,12 +1034,6 @@ class FutuQuant {
    * @property {HistoryPointsKL} klList K线数据
    */
   /**
-   * Qot_GetHistoryKLPoints.proto协议返回对象
-   * @typedef QotGetHistoryKLPointsResponse
-   * @property {SecurityHistoryKLPoints[]} klPointList 多只股票的多点历史K线点
-   * @property {boolean} hasNext 如请求不指定maxReqSecurityNum值，则不会返回该字段，该字段表示请求是否还有超过指定限制的数据
-   */
-  /**
    * Qot_GetHistoryKLPoints.proto - 3101获取多只股票多点历史K线
    *
     复权类型参考 RehabType
@@ -1062,7 +1051,7 @@ class FutuQuant {
    * @param {string[]} params.timeList 时间字符串
    * @param {number} [params.maxReqSecurityNum] 最多返回多少只股票的数据，如果未指定表示不限制
    * @param {KLFields} [params.needKLFieldsFlag] 指定返回K线结构体特定某几项数据，KLFields枚举值或组合，如果未指定返回全部字段
-   * @returns {QotGetHistoryKLPointsResponse}
+   * @returns {SecurityHistoryKLPoints[]}
    */
   qotGetHistoryKLPoints(params) { // 3101获取多只股票多点历史K线
     return this.socket.send('Qot_GetHistoryKLPoints', Object.assign({
@@ -1073,7 +1062,7 @@ class FutuQuant {
       timeList: [], // 时间字符串
       maxReqSecurityNum: 60, // 最多返回多少只股票的数据，如果未指定表示不限制
       needKLFieldsFlag: 512, // 指定返回K线结构体特定某几项数据，KLFields枚举值或组合，如果未指定返回全部字段
-    }, params));
+    }, params)).klPointList || [];
   }
   /**
    * 公司行动组合,指定某些字段值是否有效
@@ -1279,6 +1268,25 @@ class FutuQuant {
     });
   }
   /**
+  * 股票类型
+  *
+    ReferenceType_Unknow = 0;
+    ReferenceType_Warrant = 1; //正股相关的窝轮
+  * @typedef {number} ReferenceType
+  */
+  /**
+   * Qot_GetReference.proto - 3206 获取正股相关股票
+   * @async
+   * @param {security} security 股票
+   * @param {ReferenceType} [referenceType] 相关类型，默认为1，获取正股相关的涡轮
+   */
+  async qotGetReference(security, referenceType = 1) {
+    return (await this.socket.send('Qot_GetReference', {
+      security,
+      referenceType,
+    })).staticInfoList || [];
+  }
+  /**
    * Trd_GetAccList.proto - 2001获取交易账户列表
    * @async
    * @param {number} userID 需要跟FutuOpenD登陆的牛牛用户ID一致，否则会返回失败
@@ -1365,7 +1373,33 @@ class FutuQuant {
       filterConditions, // 过滤条件
       filterPLRatioMin, // 过滤盈亏比例下限，高于此比例的会返回，如0.1，返回盈亏比例大于10%的持仓
       filterPLRatioMax, // 过滤盈亏比例上限，低于此比例的会返回，如0.2，返回盈亏比例小于20%的持仓
-    })).positionList;
+    })).positionList || [];
+  }
+  /**
+   * Trd_GetMaxTrdQtys.proto - 2111获取最大交易数量
+   * @param {object} params
+   * @param {TrdHeader} [params.header] 交易公共参数头，默认不用填写
+   * @param {OrderType} params.orderType 订单类型, 参见Trd_Common.OrderType的枚举定义
+   * @param {string} params.code 代码
+   * @param {number} [params.price] 价格，3位精度(A股2位)
+   * @param {number} params.orderID 订单号，新下订单不需要，如果是修改订单就需要把原订单号带上才行，因为改单的最大买卖数量会包含原订单数量。
+   * 以下为调整价格使用，目前仅对港、A股有效，因为港股有价位，A股2位精度，美股不需要
+   * @param {boolean} [params.adjustPrice] 是否调整价格，如果价格不合法，是否调整到合法价位，true调整，false不调整
+   * @param {number} [params.adjustSideAndLimit] 调整方向和调整幅度百分比限制，正数代表向上调整，负数代表向下调整，具体值代表调整幅度限制，如：0.015代表向上调整且幅度不超过1.5%；-0.01代表向下调整且幅度不超过1%
+   * @returns {MaxTrdQtys} 最大交易数量结构体
+   */
+  async trdGetMaxTrdQtys(params) {
+    if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
+    return (await this.socket.send('Trd_GetMaxTrdQtys', Object.assign({
+      header: this.trdHeader, // 交易公共参数头
+      orderType: 1, // 订单类型, 参见Trd_Common.OrderType的枚举定义
+      code: '', // 代码
+      price: 0, // 价格，3位精度(A股2位)
+      orderID: 0, // 订单号，新下订单不需要，如果是修改订单就需要把原订单号带上才行，因为改单的最大买卖数量会包含原订单数量。
+      // 以下为调整价格使用，目前仅对港、A股有效，因为港股有价位，A股2位精度，美股不需要
+      adjustPrice: false, // 是否调整价格，如果价格不合法，是否调整到合法价位，true调整，false不调整
+      adjustSideAndLimit: 0, // 调整方向和调整幅度百分比限制，正数代表向上调整，负数代表向下调整，具体值代表调整幅度限制，如：0.015代表向上调整且幅度不超过1.5%；-0.01代表向下调整且幅度不超过1%
+    }, params))).maxTrdQtys;
   }
   /**
    * Trd_GetOrderList.proto - 2201获取订单列表
@@ -1598,7 +1632,7 @@ class FutuQuant {
   }
 }
 
-export default FutuQuant;</pre>
+module.exports = FutuQuant;</pre>
     </article>
 </section>
 
@@ -1639,7 +1673,7 @@ export default FutuQuant;</pre>
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
 	
-		on 2018-08-05T09:02:37+08:00
+		on 2018-08-15T06:26:06+08:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

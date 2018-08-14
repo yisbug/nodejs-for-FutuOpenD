@@ -263,6 +263,48 @@
             "TickerDirection_Neutral": 3
           }
         },
+        "TickerType": {
+          "values": {
+            "TickerType_Unknown": 0,
+            "TickerType_Automatch": 1,
+            "TickerType_Late": 2,
+            "TickerType_NoneAutomatch": 3,
+            "TickerType_InterAutomatch": 4,
+            "TickerType_InterNoneAutomatch": 5,
+            "TickerType_OddLot": 6,
+            "TickerType_Auction": 7,
+            "TickerType_Bulk": 8,
+            "TickerType_Crash": 9,
+            "TickerType_CrossMarket": 10,
+            "TickerType_BulkSold": 11,
+            "TickerType_FreeOnBoard": 12,
+            "TickerType_Rule127Or155": 13,
+            "TickerType_Delay": 14,
+            "TickerType_MarketCenterClosePrice": 15,
+            "TickerType_NextDay": 16,
+            "TickerType_MarketCenterOpening": 17,
+            "TickerType_PriorReferencePrice": 18,
+            "TickerType_MarketCenterOpenPrice": 19,
+            "TickerType_Seller": 20,
+            "TickerType_T": 21,
+            "TickerType_ExtendedTradingHours": 22,
+            "TickerType_Contingent": 23,
+            "TickerType_AveragePrice": 24,
+            "TickerType_OTCSold": 25,
+            "TickerType_OddLotCrossMarket": 26,
+            "TickerType_DerivativelyPriced": 27,
+            "TickerType_ReOpeningPriced": 28,
+            "TickerType_ClosingPriced": 29,
+            "TickerType_ComprehensiveDelayPrice": 30
+          }
+        },
+        "DarkStatus": {
+          "values": {
+            "DarkStatus_None": 0,
+            "DarkStatus_Trading": 1,
+            "DarkStatus_End": 2
+          }
+        },
         "Security": {
           "fields": {
             "market": {
@@ -402,6 +444,10 @@
               "rule": "required",
               "type": "double",
               "id": 14
+            },
+            "darkStatus": {
+              "type": "int32",
+              "id": 15
             }
           }
         },
@@ -559,6 +605,14 @@
             "recvTime": {
               "type": "double",
               "id": 7
+            },
+            "type": {
+              "type": "int32",
+              "id": 8
+            },
+            "typeSign": {
+              "type": "int32",
+              "id": 9
             }
           }
         },
@@ -611,54 +665,6 @@
               "rule": "required",
               "type": "bool",
               "id": 3
-            }
-          }
-        }
-      }
-    },
-    "Header": {
-      "nested": {
-        "Request": {
-          "fields": {
-            "szHeaderFlag": {
-              "rule": "required",
-              "type": "fixed64",
-              "id": 1
-            },
-            "nProtoID": {
-              "rule": "required",
-              "type": "uint32",
-              "id": 2
-            },
-            "nProtoFmtType": {
-              "rule": "required",
-              "type": "fixed64",
-              "id": 3
-            },
-            "nProtoVer": {
-              "rule": "required",
-              "type": "fixed64",
-              "id": 4
-            },
-            "nSerialNo": {
-              "rule": "required",
-              "type": "uint32",
-              "id": 5
-            },
-            "nBodyLen": {
-              "rule": "required",
-              "type": "uint32",
-              "id": 6
-            },
-            "arrBodySHA1": {
-              "rule": "required",
-              "type": "fixed64",
-              "id": 7
-            },
-            "arrReserved": {
-              "rule": "required",
-              "type": "fixed64",
-              "id": 8
             }
           }
         }
@@ -1565,6 +1571,72 @@
         }
       }
     },
+    "Qot_GetReference": {
+      "nested": {
+        "ReferenceType": {
+          "values": {
+            "ReferenceType_Unknow": 0,
+            "ReferenceType_Warrant": 1
+          }
+        },
+        "C2S": {
+          "fields": {
+            "security": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 1
+            },
+            "referenceType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 2
+            }
+          }
+        },
+        "S2C": {
+          "fields": {
+            "staticInfoList": {
+              "rule": "repeated",
+              "type": "Qot_Common.SecurityStaticInfo",
+              "id": 2
+            }
+          }
+        },
+        "Request": {
+          "fields": {
+            "c2s": {
+              "rule": "required",
+              "type": "C2S",
+              "id": 1
+            }
+          }
+        },
+        "Response": {
+          "fields": {
+            "retType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "default": -400
+              }
+            },
+            "retMsg": {
+              "type": "string",
+              "id": 2
+            },
+            "errCode": {
+              "type": "int32",
+              "id": 3
+            },
+            "s2c": {
+              "type": "S2C",
+              "id": 4
+            }
+          }
+        }
+      }
+    },
     "Qot_GetRehab": {
       "nested": {
         "C2S": {
@@ -2035,6 +2107,11 @@
             "secType": {
               "type": "int32",
               "id": 2
+            },
+            "securityList": {
+              "rule": "repeated",
+              "type": "Qot_Common.Security",
+              "id": 3
             }
           }
         },
@@ -2809,6 +2886,15 @@
             "TrdMarket_HKCC": 4
           }
         },
+        "TrdSecMarket": {
+          "values": {
+            "TrdSecMarket_Unknown": 0,
+            "TrdSecMarket_HK": 1,
+            "TrdSecMarket_US": 2,
+            "TrdSecMarket_CN_SH": 31,
+            "TrdSecMarket_CN_SZ": 32
+          }
+        },
         "TrdSide": {
           "values": {
             "TrdSide_Unknown": 0,
@@ -3008,6 +3094,10 @@
               "type": "double",
               "id": 11
             },
+            "secMarket": {
+              "type": "int32",
+              "id": 12
+            },
             "tdPlVal": {
               "type": "double",
               "id": 21
@@ -3101,6 +3191,10 @@
             "lastErrMsg": {
               "type": "string",
               "id": 14
+            },
+            "secMarket": {
+              "type": "int32",
+              "id": 15
             }
           }
         },
@@ -3161,6 +3255,36 @@
             "counterBrokerName": {
               "type": "string",
               "id": 12
+            },
+            "secMarket": {
+              "type": "int32",
+              "id": 13
+            }
+          }
+        },
+        "MaxTrdQtys": {
+          "fields": {
+            "maxCashBuy": {
+              "rule": "required",
+              "type": "double",
+              "id": 1
+            },
+            "maxCashAndMarginBuy": {
+              "type": "double",
+              "id": 2
+            },
+            "maxPositionSell": {
+              "rule": "required",
+              "type": "double",
+              "id": 3
+            },
+            "maxSellShort": {
+              "type": "double",
+              "id": 4
+            },
+            "maxBuyBack": {
+              "type": "double",
+              "id": 5
             }
           }
         },
@@ -3404,6 +3528,96 @@
             "orderList": {
               "rule": "repeated",
               "type": "Trd_Common.Order",
+              "id": 2
+            }
+          }
+        },
+        "Request": {
+          "fields": {
+            "c2s": {
+              "rule": "required",
+              "type": "C2S",
+              "id": 1
+            }
+          }
+        },
+        "Response": {
+          "fields": {
+            "retType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "default": -400
+              }
+            },
+            "retMsg": {
+              "type": "string",
+              "id": 2
+            },
+            "errCode": {
+              "type": "int32",
+              "id": 3
+            },
+            "s2c": {
+              "type": "S2C",
+              "id": 4
+            }
+          }
+        }
+      }
+    },
+    "Trd_GetMaxTrdQtys": {
+      "nested": {
+        "C2S": {
+          "fields": {
+            "header": {
+              "rule": "required",
+              "type": "Trd_Common.TrdHeader",
+              "id": 1
+            },
+            "orderType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 2
+            },
+            "code": {
+              "rule": "required",
+              "type": "string",
+              "id": 3
+            },
+            "price": {
+              "rule": "required",
+              "type": "double",
+              "id": 4
+            },
+            "orderID": {
+              "type": "uint64",
+              "id": 5
+            },
+            "adjustPrice": {
+              "type": "bool",
+              "id": 6
+            },
+            "adjustSideAndLimit": {
+              "type": "double",
+              "id": 7
+            },
+            "secMarket": {
+              "type": "int32",
+              "id": 8
+            }
+          }
+        },
+        "S2C": {
+          "fields": {
+            "header": {
+              "rule": "required",
+              "type": "Trd_Common.TrdHeader",
+              "id": 1
+            },
+            "maxTrdQtys": {
+              "type": "Trd_Common.MaxTrdQtys",
               "id": 2
             }
           }
@@ -3833,6 +4047,10 @@
             "adjustSideAndLimit": {
               "type": "double",
               "id": 9
+            },
+            "secMarket": {
+              "type": "int32",
+              "id": 10
             }
           }
         },

@@ -1,18 +1,24 @@
 syntax = "proto2";
-package Qot_GetRT;
+package Qot_GetReference;
 
 import "Common.proto";
 import "Qot_Common.proto";
 
+enum ReferenceType
+{
+	ReferenceType_Unknow = 0; 
+	ReferenceType_Warrant = 1; //正股相关的窝轮
+}
+
 message C2S
 {
 	required Qot_Common.Security security = 1; //股票
+	required int32 referenceType = 2; // ReferenceType, 相关类型
 }
 
 message S2C
 {
-	required Qot_Common.Security security = 1; //股票
-	repeated Qot_Common.TimeShare rtList = 2; //分时点
+	repeated Qot_Common.SecurityStaticInfo staticInfoList = 2; //相关股票列表
 }
 
 message Request

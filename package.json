@@ -1,17 +1,16 @@
 {
   "name": "futuquant",
-  "version": "0.2.1",
+  "version": "3.2.0",
   "description": "FutuQuant-Nodejs",
   "main": "src/futuquant.js",
   "scripts": {
-    "test": "mocha -r esm -t 600000 -b -w test/*",
-    "test1": "mocha -r esm -t 600000 -b ",
+    "test": "mocha -t 600000 -b -w test/*",
+    "test1": "mocha -t 600000 -b ",
     "doc": "rm -rf doc && jsdoc -c jsdoc.json -t ./node_modules/ink-docstrap/template",
-    "build": "babel src/*.mjs -d .",
     "demo-es6": "node --experimental-modules demo.mjs",
     "demo-es5": "node demo.js",
     "pb": "pbjs -t json src/pb/*.proto > src/pb.json",
-    "pub":"npm run pb && npm run build && npm run doc && npm publish"
+    "pub": "npm run pb && npm run build && npm run doc && npm publish"
   },
   "repository": {
     "type": "git",
@@ -31,19 +30,15 @@
     "protobufjs": "^6.8.6"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
-    "babel-preset-es2015": "^6.24.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.12.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.9.1",
-    "esm": "^3.0.55",
     "ink-docstrap": "^1.3.2",
     "jsdoc": "^3.5.5",
     "mocha": "^5.2.0",
-    "should": "^13.2.1"
+    "should": "^13.2.1",
+    "uglify-js": "^3.4.7"
   }
 }

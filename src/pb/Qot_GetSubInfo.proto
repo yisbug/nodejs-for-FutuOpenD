@@ -6,14 +6,14 @@ import "Qot_Common.proto";
 
 message C2S
 {
-	optional bool isReqAllConn = 1; //ÊÇ·ñ·µ»ØËùÓĞÁ¬½ÓµÄ¶©ÔÄ×´Ì¬,²»´«»òÕß´«falseÖ»·µ»Øµ±Ç°Á¬½ÓÊı¾İ
+	optional bool isReqAllConn = 1; //æ˜¯å¦è¿”å›æ‰€æœ‰è¿æ¥çš„è®¢é˜…çŠ¶æ€,ä¸ä¼ æˆ–è€…ä¼ falseåªè¿”å›å½“å‰è¿æ¥æ•°æ®
 }
 
 message S2C
 {
-	repeated Qot_Common.ConnSubInfo connSubInfoList = 1; //¶©ÔÄ¶©ÔÄĞÅÏ¢
-	required int32 totalUsedQuota = 2; //FutuOpenDÒÑÊ¹ÓÃµÄ¶©ÔÄ¶î¶È
-	required int32 remainQuota = 3; //FutuOpenDÊ£Óà¶©ÔÄ¶î¶È
+	repeated Qot_Common.ConnSubInfo connSubInfoList = 1; //è®¢é˜…è®¢é˜…ä¿¡æ¯
+	required int32 totalUsedQuota = 2; //FutuOpenDå·²ä½¿ç”¨çš„è®¢é˜…é¢åº¦
+	required int32 remainQuota = 3; //FutuOpenDå‰©ä½™è®¢é˜…é¢åº¦
 }
 
 message Request
@@ -23,7 +23,7 @@ message Request
 
 message Response
 {
-	required int32 retType = 1 [default = -400]; //RetType,·µ»Ø½á¹û
+	required int32 retType = 1 [default = -400]; //RetType,è¿”å›ç»“æœ
 	optional string retMsg = 2;
 	optional int32 errCode = 3;
 	
