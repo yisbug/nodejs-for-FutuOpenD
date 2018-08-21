@@ -727,24 +727,24 @@ class FutuQuant {
    * @async
    * @param {QotMarket} market Qot_Common.QotMarket,股票市场
    * @param {PlateSetType} plateSetType Qot_Common.PlateSetType,板块集合的类型
-   * @returns {PlateInfo[]} plateInfoList 板块集合下的板块信息
+   * @returns {PlateInfo[]}  板块集合下的板块信息
    */
-  qotGetPlateSet(market = 1, plateSetType) { // 3204获取板块集合下的板块
-    return this.socket.send('Qot_GetPlateSet', {
+  async qotGetPlateSet(market = 1, plateSetType) { // 3204获取板块集合下的板块
+    return (await this.socket.send('Qot_GetPlateSet', {
       market,
       plateSetType,
-    });
+    })).plateInfoList || [];
   }
   /**
    * Qot_GetPlateSecurity.proto - 3205获取板块下的股票
    * @async
    * @param {Security} plate 板块
-   * @returns {SecurityStaticInfo[]} staticInfoList 板块下的股票静态信息
+   * @returns {SecurityStaticInfo[]}  板块下的股票静态信息
    */
-  qotGetPlateSecurity(plate) { // 3205获取板块下的股票
-    return this.socket.send('Qot_GetPlateSecurity', {
+  async qotGetPlateSecurity(plate) { // 3205获取板块下的股票
+    return (await this.socket.send('Qot_GetPlateSecurity', {
       plate,
-    });
+    })).staticInfoList || [];
   }
   /**
   * 股票类型
@@ -768,21 +768,15 @@ class FutuQuant {
   /**
    * Trd_GetAccList.proto - 2001获取交易账户列表
    * @async
-   * @param {number} userID 需要跟FutuOpenD登陆的牛牛用户ID一致，否则会返回失败
-   * @param {QotMarket} [market=1] Qot_Common.QotMarket,股票市场
    * @returns {TrdAcc[]} 交易业务账户列表
    */
-  async trdGetAccList(userID = this.userID, market = 1) { // 2001获取交易账户列表
+  async trdGetAccList() { // 2001获取交易账户列表
     const {
       accList,
     } = (await this.socket.send('Trd_GetAccList', {
-      userID,
+      userID: this.userID,
     }));
-    return accList.filter(acc => acc.trdMarketAuthList.includes(market));
-
-    // return this.socket.send('Trd_GetAccList', {
-    //   userID,
-    // });
+    return accList.filter(acc => acc.trdMarketAuthList.includes(this.market));
   }
   /**
    * Trd_UnlockTrade.proto - 2005解锁或锁定交易
@@ -819,7 +813,7 @@ class FutuQuant {
    * @param {number} accID 业务账号, 业务账号与交易环境、市场权限需要匹配，否则会返回错误，默认为当前userID
    * @param {TrdMarket} [trdMarket=1] 交易市场, 参见TrdMarket的枚举定义，默认为1，即香港市场。
    */
-  setCommonTradeHeader(trdEnv, accID, trdMarket = 1) { // 设置交易模块的公共header，调用交易相关接口前必须先调用此接口。
+  setCommonTradeHeader(trdEnv = 1, accID, trdMarket = 1) { // 设置交易模块的公共header，调用交易相关接口前必须先调用此接口。
     this.market = trdMarket;
     this.trdHeader = {
       trdEnv,
@@ -893,7 +887,7 @@ class FutuQuant {
       header: this.trdHeader, // 交易公共参数头
       filterConditions,
       filterStatusList,
-    })).orderList;
+    })).orderList || [];
   }
   /**
    * Trd_PlaceOrder.proto - 2202下单
@@ -952,7 +946,7 @@ class FutuQuant {
     while (remainQty > 0) {
       let orderID = null;
       let order = null;
-      const orderBooks = await this.qotGetOrderBook({ market: 1, code });// 获取盘口
+      const orderBooks = await this.qotGetOrderBook({ market: this.market, code });// 获取盘口
       const price = trdSide === 1 ? orderBooks.sellList[0].price : orderBooks.buyList[0].price;
       if (orderID && order.orderStatus === 10) {
         await this.trdModifyOrder({// 修改订单并设置订单为有效
@@ -1059,7 +1053,7 @@ class FutuQuant {
     return (await this.socket.send('Trd_GetOrderFillList', {
       header: this.trdHeader, // 交易公共参数头
       filterConditions,
-    })).orderFillList;
+    })).orderFillList || [];
   }
   /**
    * 注册新成交通知
@@ -1068,7 +1062,7 @@ class FutuQuant {
    * @returns {OrderFill} 成交结构
    */
   async subTrdUpdateOrderFill(callback) { // 注册新成交通知
-    return this.socket.subNotify(2218, data => callback(data.orderFill));
+    return this.socket.subNotify(2218, data => callback(data.orderFill || []));
   }
   /**
    * Trd_GetHistoryOrderList.proto - 2221获取历史订单列表
@@ -1089,7 +1083,7 @@ class FutuQuant {
       header: this.trdHeader, // 交易公共参数头
       filterConditions,
       filterStatusList,
-    })).orderList;
+    })).orderList || [];
   }
   /**
    * Trd_GetHistoryOrderFillList.proto - 2222获取历史成交列表
@@ -1107,7 +1101,7 @@ class FutuQuant {
     return (await this.socket.send('Trd_GetHistoryOrderFillList', {
       header: this.trdHeader, // 交易公共参数头
       filterConditions,
-    })).orderFillList;
+    })).orderFillList || [];
   }
 }
 
