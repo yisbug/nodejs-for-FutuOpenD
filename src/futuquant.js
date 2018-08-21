@@ -451,8 +451,8 @@ class FutuQuant {
       security: {}, // 股票市场以及股票代码
       beginTime: '', // 开始时间字符串
       endTime: '', // 结束时间字符串
-      maxAckKLNum: 60, // 最多返回多少根K线，如果未指定表示不限制
-      needKLFieldsFlag: 512, // 指定返回K线结构体特定某几项数据，KLFields枚举值或组合，如果未指定返回全部字段
+      // maxAckKLNum: 60, // 最多返回多少根K线，如果未指定表示不限制
+      // needKLFieldsFlag: 512, // 指定返回K线结构体特定某几项数据，KLFields枚举值或组合，如果未指定返回全部字段
     }, params))).klList || [];
   }
   /**
@@ -587,16 +587,16 @@ class FutuQuant {
    * Qot_GetTradeDate.proto - 3200获取市场交易日
    * @async
    * @param {QotMarket} market  Qot_Common.QotMarket,股票市场
-   * @param {string} beginTime 开始时间字符串
-   * @param {string} endTime 结束时间字符串
+   * @param {string} beginTime 开始时间字符串 2018-01-01 00:00:00
+   * @param {string} endTime 结束时间字符串 2018-02-01 00:00:00
    * @return {TradeDate[]} tradeDateList 交易日
    */
-  qotGetTradeDate(market = 1, beginTime = '2018-01-01 00:00:00', endTime = '2018-02-01 00:00:00') { // 3200获取市场交易日
-    return this.socket.send('Qot_GetTradeDate', {
+  async qotGetTradeDate(market = 1, beginTime, endTime) { // 3200获取市场交易日
+    return (await this.socket.send('Qot_GetTradeDate', {
       market,
       beginTime,
       endTime,
-    });
+    })).tradeDateList || [];
   }
   /**
    * Qot_GetStaticInfo.proto - 3202获取股票静态信息
@@ -609,7 +609,7 @@ class FutuQuant {
     return (await this.socket.send('Qot_GetStaticInfo', {
       market,
       secType,
-    })).staticInfoList;
+    })).staticInfoList || [];
   }
   /**
    * 正股类型额外数据
