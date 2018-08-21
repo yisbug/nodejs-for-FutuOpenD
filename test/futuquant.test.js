@@ -20,16 +20,32 @@ const ft = new FtQuant({
 
 describe('FtQuant', () => {
   before(async () => {
+    console.log('test start.');
     const res = await ft.initConnect();
-    console.log('initConnect', res);
+    (typeof res.serverVer !== 'undefined').should.be.true();
+    (typeof res.loginUserID !== 'undefined').should.be.true();
+    (typeof res.connID !== 'undefined').should.be.true();
+    (typeof res.connAESKey !== 'undefined').should.be.true();
+    (typeof res.keepAliveInterval === 'number').should.be.true();
     const { accID } = (await ft.trdGetAccList())[0];
     await ft.setCommonTradeHeader(1, accID, 1); // 设置为港股的真实环境
+  });
+  after(async () => {
+    console.log('test end.');
   });
 
   it('getGlobalState', async () => {
     const res = await ft.getGlobalState();
-    console.log('getGlobalState', res);
     (typeof res.marketHK !== 'undefined').should.be.true();
+    (typeof res.marketUS !== 'undefined').should.be.true();
+    (typeof res.marketSH !== 'undefined').should.be.true();
+    (typeof res.marketSZ !== 'undefined').should.be.true();
+    (typeof res.marketHKFuture !== 'undefined').should.be.true();
+    (typeof res.qotLogined !== 'undefined').should.be.true();
+    (typeof res.trdLogined !== 'undefined').should.be.true();
+    (typeof res.serverVer !== 'undefined').should.be.true();
+    (typeof res.serverBuildNo !== 'undefined').should.be.true();
+    (typeof res.time !== 'undefined').should.be.true();
   });
 
   it('qotGetStaticInfo', async () => {
@@ -38,8 +54,7 @@ describe('FtQuant', () => {
   });
 
   it('trdUnlockTrade', async () => {
-    const res = await ft.trdUnlockTrade(true, pwdMd5);
-    console.log('trdUnlockTrade', res);
+    await ft.trdUnlockTrade(true, pwdMd5);
   });
 
   it('qotGetTradeDate', async () => {
@@ -50,13 +65,39 @@ describe('FtQuant', () => {
 
   it('trdGetMaxTrdQtys', async () => {
     const res = await ft.trdGetMaxTrdQtys({ code: '00700' });
-
-    console.log('res', res);
+    (typeof res.maxCashBuy !== 'undefined').should.be.true();
   });
 
   it('qotGetReference', async () => {
     const res = await ft.qotGetReference({ code: '00700', market: 1 });
-    console.log('res', res.length, res[0]);
-    res.length.should.be.above(100);
+    // console.log('res', res.length, res[0]);
+    (typeof res[0].basic !== 'undefined').should.be.true();
+  });
+
+  it('trdGetHistoryOrderList', async () => {
+    const res = await ft.trdGetHistoryOrderList({
+      beginTime: '2018-08-01 00:00:00',
+      endTime: '2018-08-16 00:00:00',
+    }, [10, 11]);
+    Array.isArray(res).should.be.true();
+  });
+
+  it('qotGetRT', async () => {
+    await ft.qotSub({
+      securityList: [{ code: '00700', market: 1 }],
+      subTypeList: [5],
+    });
+    const res = await ft.qotGetRT({ code: '00700', market: 1 });
+    Array.isArray(res).should.be.true();
+    res.length.should.be.above(0);
+    const item = res[0];
+    (typeof item.time !== 'undefined').should.be.true();
+    (typeof item.minute !== 'undefined').should.be.true();
+    (typeof item.isBlank !== 'undefined').should.be.true();
+    (typeof item.price !== 'undefined').should.be.true();
+    (typeof item.lastClosePrice !== 'undefined').should.be.true();
+    (typeof item.avgPrice !== 'undefined').should.be.true();
+    (typeof item.volume !== 'undefined').should.be.true();
+    (typeof item.turnover !== 'undefined').should.be.true();
   });
 });
