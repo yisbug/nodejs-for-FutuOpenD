@@ -681,15 +681,40 @@ class FutuQuant {
    */
   async qotGetSecuritySnapShot(securityList) { // 3203获取股票快照
     const list = [].concat(securityList);
-    let result = [];
+    let snapshotList = [];
     while (list.length) {
-      const res = (await this.socket.send('Qot_GetSecuritySnapshot', {
-        securityList: list.splice(-200),
-      })).snapshotList;
-      result = result.concat(res);
-      await sleep(1000 * 3);
+      const res = await this.limitExecTimes(
+        30 * 1000, 10,
+        async () => {
+          const data = await this.socket.send('Qot_GetSecuritySnapshot', {
+            securityList: list.splice(-200),
+          });
+          return data.snapshotList;
+        },
+      );
+      snapshotList = snapshotList.concat(res);
     }
-    return result;
+    return snapshotList;
+  }
+  /**
+   * 限制接口调用频率
+   * @param {Number} interval  限频间隔
+   * @param {Number} times   次数
+   * @param {Function} fn  要执行的函数
+   */
+  async limitExecTimes(interval, times, fn) {
+    const now = Date.now();
+    const name = `${fn.toString()}_exec_time_array`;
+    const execArray = this[name] || [];
+    while (execArray[0] && now - execArray[0] > interval) {
+      execArray.shift();
+    }
+    if (execArray.length > times) {
+      await this.sleep(interval - (now - execArray[0]));
+    }
+    execArray.push(Date.now());
+    this[name] = execArray;
+    return fn();
   }
   /**
    * PlateInfo
