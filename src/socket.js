@@ -62,6 +62,8 @@ class Socket {
      */
     this.requestId = 1000; // 请求序列号，自增
 
+    this.isHandStop = false;
+
     this.root = protobufjs.Root.fromJSON(Pb);
 
     this.cacheResponseCallback = {}; // 缓存的回调函数
@@ -83,6 +85,7 @@ class Socket {
     });
     // 为客户端添加“close”事件处理函数
     this.socket.on('close', () => {
+      if (this.isHandStop) return;
       const errMsg = `${this.name} on closed and retry connect on 5 seconds.`;
       this.logger.error(errMsg);
       this.isConnect = false;
@@ -106,6 +109,7 @@ class Socket {
    * 立即建立连接
    */
   async connect() {
+    this.isHandStop = false;
     return new Promise((resolve) => {
       if (this.timerRecontent) {
         clearTimeout(this.timerRecontent);
@@ -122,6 +126,12 @@ class Socket {
         resolve();
       });
     });
+  }
+  async close() {
+    this.socket.end();
+    this.socket.destroy();
+    this.isHandStop = true;
+    this.logger.info('手动关闭 socket 。');
   }
   /**
    * 设置连接成功的回调函数
