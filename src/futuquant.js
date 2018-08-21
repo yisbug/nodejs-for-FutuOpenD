@@ -100,7 +100,7 @@ class FutuQuant {
    * @param {boolean} params.recvNotify 此连接是否接收市场状态、交易需要重新解锁等等事件通知，true代表接收，FutuOpenD就会向此连接推送这些通知，反之false代表不接收不推送
    * @returns {InitConnectResponse}
    */
-  async initConnect(params) { // 初始化连接
+  async initConnect(params) {
     if (this.inited) throw new Error('请勿重复初始化连接');
     return new Promise(async (resolve) => {
       this.inited = true;
@@ -143,7 +143,7 @@ class FutuQuant {
    * @async
    * @returns {GetGlobalStateResponse}
    */
-  getGlobalState() { // 1002获取全局状态
+  getGlobalState() {
     return this.socket.send('GetGlobalState', {
       userID: this.userID,
     });
@@ -152,7 +152,7 @@ class FutuQuant {
    * KeepAlive.proto - 1004保活心跳
    * @returns {number} time 服务器回包时的格林威治时间戳，单位秒
    */
-  async keepAlive() { // 1004保活心跳
+  async keepAlive() {
     const time = await this.socket.send('KeepAlive', {
       time: Math.round(Date.now() / 1000),
     });
@@ -175,7 +175,7 @@ class FutuQuant {
    * @param {boolean} [params.isFirstPush=true] 注册后如果本地已有数据是否首推一次已存在数据,该参数不指定则默认true
    * @async
    */
-  qotSub(params) { // 3001订阅或者反订阅
+  qotSub(params) {
     return this.socket.send('Qot_Sub', Object.assign({
       securityList: [],
       subTypeList: [],
@@ -239,7 +239,7 @@ class FutuQuant {
   async qotGetBasicQot(securityList) { // 3004获取股票基本行情
     return (await this.socket.send('Qot_GetBasicQot', {
       securityList,
-    })).basicQotList;
+    })).basicQotList || [];
   }
   /**
    * 注册股票基本报价通知，需要先调用订阅接口
@@ -249,7 +249,7 @@ class FutuQuant {
    * @returns {BasicQot[]} basicQotList
    */
   subQotUpdateBasicQot(callback) { // 注册股票基本报价通知
-    return this.socket.subNotify(3005, data => callback(data.basicQotList));
+    return this.socket.subNotify(3005, data => callback(data.basicQotList || []));
   }
   /**
    * Qot_GetKL.proto - 3006获取K线
@@ -287,10 +287,10 @@ class FutuQuant {
    * 注册K线推送，需要先调用订阅接口
    * Qot_UpdateKL.proto - 3007推送K线
    * @async
-   * @returns {KLine[]} 推送的k线点
+   * @returns {QotUpdateKLResponse} 推送的k线点
    */
   subQotUpdateKL(callback) { // 注册K线推送
-    return this.socket.subNotify(3007, data => callback(data.klList || []));
+    return this.socket.subNotify(3007, callback);
   }
   /**
    * Qot_GetRT.proto - 3008获取分时
@@ -330,14 +330,20 @@ class FutuQuant {
     })).tickerList || [];
   }
   /**
+   * Qot_GetTicker.proto协议返回对象
+   * @typedef subQotUpdateTickerResponse
+   * @property {Security} security 股票
+   * @property {Ticker[]} tickerList 逐笔
+   */
+  /**
    * 注册逐笔推送，需要先调用订阅接口
    * Qot_UpdateTicker.proto - 3011推送逐笔
    * @async
    * @param {function} callback  回调
-   * @returns {Ticker[]} 逐笔
+   * @returns {subQotUpdateTickerResponse} 逐笔
    */
   subQotUpdateTicker(callback) { // 注册逐笔推送
-    return this.socket.subNotify(3011, data => callback(data.tickerList || []));
+    return this.socket.subNotify(3011, callback);
   }
   /**
    * Qot_GetOrderBook.proto协议返回对象
