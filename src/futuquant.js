@@ -16,66 +16,57 @@ class FutuQuant {
    * @param {string} params.ip FutuOpenD服务IP
    * @param {number} params.port FutuOpenD服务端口
    * @param {number} params.userID 牛牛号
-   * @param {TrdMarket} [params.market] 市场环境
+   * @param {string} params.pwdMd5 解锁交易 md5
+   * @param {TrdMarket} [params.market] 市场环境，默认为港股环境，1港股2美股3大陆市场4香港A股通市场
+   * @param {TrdEnv} [params.env] 0为仿真环境，1为真实环境，2为回测环境，默认为1
    * @param {object} [logger] 日志对象，若不传入，则使用bunyan.createLogger创建
    * @memberof FutuQuant
    */
   constructor(params, logger) {
     if (typeof params !== 'object') throw new Error('传入参数类型错误');
+    // 处理参数
     const {
       ip,
       port,
       userID,
       market,
+      pwdMd5,
+      env,
     } = params;
     if (!ip) throw new Error('必须指定FutuOpenD服务的ip');
     if (!port) throw new Error('必须指定FutuOpenD服务的port');
     if (!userID) throw new Error('必须指定FutuOpenD服务的牛牛号');
+    if (!pwdMd5) throw new Error('必须指定FutuOpenD服务的解锁 MD5');
 
     this.logger = logger;
-    this.market = market || 1; // 当前市场环境
+    this.market = market || 1; // 当前市场环境，1港股2美股3大陆市场4香港A股通市场
+    this.userID = userID;
+    this.pwdMd5 = pwdMd5;
+    this.params = params;
+    this.env = env;
+    if (typeof this.env !== 'number') this.env = 1; // 0为仿真环境，1为真实环境，2为回测环境
 
+    // 处理日志
+    const methods = ['debug', 'info', 'warn', 'error', 'fatal', 'trace'];
     if (this.logger) {
-      ['debug', 'info', 'warn', 'error', 'fatal', 'trace'].forEach((key) => {
+      methods.forEach((key) => {
         if (typeof this.logger[key] !== 'function') this.logger = null;
       });
     }
-    if (!this.logger) {
-      this.logger = bunyan.createLogger({
-        name: 'sys',
-        streams: [{
-          level: 'debug',
-          type: 'raw',
-          serializers: bunyanDebugStream.serializers,
-          stream: bunyanDebugStream({ forceColor: true }),
-        }],
-      });
-    }
-    /**
-     * 实例化的socket对象
-     * @type {Socket}
-     */
-    this.socket = new Socket(ip, port, this.logger); // 所有行情拉取接口
-    /**
-     * 牛牛号
-     * @type {number}
-     */
-    this.userID = userID;
-    /**
-     * 是否已经初始化
-     * @type {boolean}
-     */
-    this.inited = false;
-    /**
-     * 交易公共头部信息
-     * @type {TrdHeader}
-     */
-    this.trdHeader = null;
-    /**
-     * 保持心跳定时器
-     * @type {number}
-     */
-    this.timerKeepLive = null;
+    this.logger = this.logger || bunyan.createLogger({
+      name: 'sys',
+      streams: [{
+        level: 'debug',
+        type: 'raw',
+        serializers: bunyanDebugStream.serializers,
+        stream: bunyanDebugStream({ forceColor: true }),
+      }],
+    });
+
+    this.socket = new Socket(ip, port, this.logger); // 实例化的socket对象,所有行情拉取接口
+    this.inited = false; // 是否已经初始化
+    this.trdHeader = null; // 交易公共头部信息
+    this.timerKeepLive = null; // 保持心跳定时器
   }
   /**
    * 初始化连接，InitConnect.proto协议返回对象
