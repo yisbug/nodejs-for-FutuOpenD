@@ -64,20 +64,14 @@ yarn add futuquant
 -  **30秒内不能超过20次交易请求。**
 -  **建议所有行情拉取接口在同一条长连接上。推送数据在第二条长连接上。交易接口在第三条长连接上。**
  */
-const FtQuant = require('./src/futuquant');
 const fs = require('fs');
 const path = require('path');
+const FtQuant = require('./src/futuquant');
+
+// 自定义日志对象
 const bunyan = require('bunyan');
 const bunyanDebugStream = require('bunyan-debug-stream');
 
-const FutuOpenDXMLPath = path.join(__dirname, '../FutuOpenD_1.01_Mac/FutuOpenD.xml');
-const ftOpenDConfig = fs.readFileSync(FutuOpenDXMLPath);
-
-// 从 opend 的配置文件中获取 userID，pwd
-const userID = ftOpenDConfig.match(/login_account>(\d*?)<\/login_account/)[1];
-const pwdMd5 = ftOpenDConfig.match(/trade_pwd_md5>(.*?)<\/trade_pwd_md5/)[1];
-
-// 自定义日志对象
 const bunyanLogger = bunyan.createLogger({
   name: 'sys',
   streams: [{
@@ -88,21 +82,35 @@ const bunyanLogger = bunyan.createLogger({
   }],
 });
 
-const ft = new FtQuant({
-  ip: '127.0.0.1', // FutuOpenD服务IP
-  port: 11111, // FutuOpenD服务端口
-  userID, // 牛牛号
-}, bunyanLogger);
+// 从 opend 的配置文件中获取 userID，pwd
+const FutuOpenDXMLPath = path.join(__dirname, '../FutuOpenD_1.01_Mac/FutuOpenD.xml');
+const ftOpenDConfig = fs.readFileSync(FutuOpenDXMLPath);
+const userID = ftOpenDConfig.match(/login_account>(\d*?)<\/login_account/)[1];
+const pwdMd5 = ftOpenDConfig.match(/trade_pwd_md5>(.*?)<\/trade_pwd_md5/)[1];
+
+// openD 配置
+const ftConfig = {
+  ip: '127.0.0.1',
+  port: 11111,
+  userID,
+  market: 1, // 港股环境
+  pwdMd5,
+  env: 1, // 0为仿真，1为真实，默认为1。
+};
+
+const ft = new FtQuant(ftConfig, bunyanLogger);
 
 const init = async () => {
   let res = null;
-  res = await ft.initConnect(); // 初始化连接
-  console.log('initConnect', res);
+  await ft.init(); // 初始化 ft 模块
   res = await ft.getGlobalState(); // 获取全局状态
   console.log('getGlobalState', res);
-  await ft.trdUnlockTrade(true, pwdMd5); // 解锁交易密码
-  const { accID } = (await ft.trdGetAccList())[0];
-  await ft.setCommonTradeHeader(1, accID, 1); // 设置为港股的真实环境
+
+  // 获取历史成交记录，不再需要手动解锁交易密码以及调用setCommonTradeHeader
+  await ft.trdGetHistoryOrderFillList({
+    beginTime: '2018-01-01 00:00:00',
+    endTime: '2018-02-01 00:00:00',
+  });
 };
 
 init();

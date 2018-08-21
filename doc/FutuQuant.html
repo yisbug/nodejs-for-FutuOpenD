@@ -287,6 +287,38 @@
 
         <tr>
             
+                <td class="name"><code>pwdMd5</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>解锁交易 md5</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>market</code></td>
             
 
@@ -314,7 +346,41 @@
 
             
 
-            <td class="description last"><p>市场环境</p></td>
+            <td class="description last"><p>市场环境，默认为港股环境，1港股2美股3大陆市场4香港A股通市场</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>env</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#TrdEnv">TrdEnv</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>0为仿真环境，1为真实环境，2为回测环境，默认为1</p></td>
         </tr>
 
     
@@ -400,7 +466,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-485">line 485</a>
+				 <a href="futuquant.js.html#sunlight-1-line-12">line 12</a>
 			</li>
 		</ul>
 	</dd>
@@ -446,168 +512,6 @@
         <h3 class="subsection-title">Members</h3>
 
         <dl>
-            
-<hr>
-<dt class="name" id="inited">
-    <h4 id="inited"><span class="type-signature"></span>inited<span class="type-signature"> :boolean</span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>是否已经初始化</p>
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">boolean</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-541">line 541</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="socket">
-    <h4 id="socket"><span class="type-signature"></span>socket<span class="type-signature"> :<a href="Socket.html">Socket</a></span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>实例化的socket对象</p>
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type"><a href="Socket.html">Socket</a></span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-531">line 531</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
             
 <hr>
 <dt class="name" id="subQotUpdateOrderBook">
@@ -672,250 +576,7 @@ Qot_UpdateOrderBook.proto - 3013推送买卖盘</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-851">line 851</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="timerKeepLive">
-    <h4 id="timerKeepLive"><span class="type-signature"></span>timerKeepLive<span class="type-signature"> :number</span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>保持心跳定时器</p>
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">number</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-551">line 551</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="trdHeader">
-    <h4 id="trdHeader"><span class="type-signature"></span>trdHeader<span class="type-signature"> :<a href="global.html#TrdHeader">TrdHeader</a></span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>交易公共头部信息</p>
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type"><a href="global.html#TrdHeader">TrdHeader</a></span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-546">line 546</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="userID">
-    <h4 id="userID"><span class="type-signature"></span>userID<span class="type-signature"> :number</span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>牛牛号</p>
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">number</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-536">line 536</a>
+				 <a href="futuquant.js.html#sunlight-1-line-394">line 394</a>
 			</li>
 		</ul>
 	</dd>
@@ -939,6 +600,94 @@ Qot_UpdateOrderBook.proto - 3013推送买卖盘</p>
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="close"><span class="type-signature"></span>close()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>断开连接</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="futuquant.js.html">futuquant.js</a>,
+				 <a href="futuquant.js.html#sunlight-1-line-130">line 130</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
             
 <hr>
 <dt>
@@ -997,7 +746,7 @@ Qot_UpdateOrderBook.proto - 3013推送买卖盘</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-619">line 619</a>
+				 <a href="futuquant.js.html#sunlight-1-line-156">line 156</a>
 			</li>
 		</ul>
 	</dd>
@@ -1042,6 +791,94 @@ Qot_UpdateOrderBook.proto - 3013推送买卖盘</p>
 
 
         
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="init"><span class="type-signature">&lt;async> </span>init()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>初始化处理</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="futuquant.js.html">futuquant.js</a>,
+				 <a href="futuquant.js.html#sunlight-1-line-74">line 74</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 
     
 </dd>
@@ -1257,7 +1094,7 @@ keepAliveInterval 为建议client发起心跳 KeepAlive 的间隔</code></pre>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-576">line 576</a>
+				 <a href="futuquant.js.html#sunlight-1-line-103">line 103</a>
 			</li>
 		</ul>
 	</dd>
@@ -1365,7 +1202,7 @@ keepAliveInterval 为建议client发起心跳 KeepAlive 的间隔</code></pre>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-628">line 628</a>
+				 <a href="futuquant.js.html#sunlight-1-line-165">line 165</a>
 			</li>
 		</ul>
 	</dd>
@@ -1414,6 +1251,192 @@ keepAliveInterval 为建议client发起心跳 KeepAlive 的间隔</code></pre>
 
 
         
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="limitExecTimes"><span class="type-signature">&lt;async> </span>limitExecTimes(interval, times, fn)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>限制接口调用频率</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>interval</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>限频间隔</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>times</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>次数</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fn</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>要执行的函数</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="futuquant.js.html">futuquant.js</a>,
+				 <a href="futuquant.js.html#sunlight-1-line-715">line 715</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 
     
 </dd>
@@ -1529,7 +1552,7 @@ keepAliveInterval 为建议client发起心跳 KeepAlive 的间隔</code></pre>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-712">line 712</a>
+				 <a href="futuquant.js.html#sunlight-1-line-249">line 249</a>
 			</li>
 		</ul>
 	</dd>
@@ -1691,7 +1714,7 @@ keepAliveInterval 为建议client发起心跳 KeepAlive 的间隔</code></pre>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-875">line 875</a>
+				 <a href="futuquant.js.html#sunlight-1-line-418">line 418</a>
 			</li>
 		</ul>
 	</dd>
@@ -2105,7 +2128,7 @@ keepAliveInterval 为建议client发起心跳 KeepAlive 的间隔</code></pre>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-914">line 914</a>
+				 <a href="futuquant.js.html#sunlight-1-line-457">line 457</a>
 			</li>
 		</ul>
 	</dd>
@@ -2525,7 +2548,7 @@ K线字段类型参考 KLFields
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-977">line 977</a>
+				 <a href="futuquant.js.html#sunlight-1-line-520">line 520</a>
 			</li>
 		</ul>
 	</dd>
@@ -2810,7 +2833,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-743">line 743</a>
+				 <a href="futuquant.js.html#sunlight-1-line-280">line 280</a>
 			</li>
 		</ul>
 	</dd>
@@ -3008,7 +3031,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-831">line 831</a>
+				 <a href="futuquant.js.html#sunlight-1-line-374">line 374</a>
 			</li>
 		</ul>
 	</dd>
@@ -3166,7 +3189,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1186">line 1186</a>
+				 <a href="futuquant.js.html#sunlight-1-line-754">line 754</a>
 			</li>
 		</ul>
 	</dd>
@@ -3195,7 +3218,7 @@ K线结构参考 KLine
     
             
 <div class="param-desc">
-    <p>staticInfoList 板块下的股票静态信息</p>
+    <p>板块下的股票静态信息</p>
 </div>
 
 
@@ -3364,7 +3387,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1174">line 1174</a>
+				 <a href="futuquant.js.html#sunlight-1-line-742">line 742</a>
 			</li>
 		</ul>
 	</dd>
@@ -3393,7 +3416,7 @@ K线结构参考 KLine
     
             
 <div class="param-desc">
-    <p>plateInfoList 板块集合下的板块信息</p>
+    <p>板块集合下的板块信息</p>
 </div>
 
 
@@ -3582,7 +3605,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1204">line 1204</a>
+				 <a href="futuquant.js.html#sunlight-1-line-772">line 772</a>
 			</li>
 		</ul>
 	</dd>
@@ -3720,7 +3743,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1042">line 1042</a>
+				 <a href="futuquant.js.html#sunlight-1-line-585">line 585</a>
 			</li>
 		</ul>
 	</dd>
@@ -3882,7 +3905,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-774">line 774</a>
+				 <a href="futuquant.js.html#sunlight-1-line-311">line 311</a>
 			</li>
 		</ul>
 	</dd>
@@ -4047,7 +4070,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1149">line 1149</a>
+				 <a href="futuquant.js.html#sunlight-1-line-692">line 692</a>
 			</li>
 		</ul>
 	</dd>
@@ -4245,7 +4268,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1075">line 1075</a>
+				 <a href="futuquant.js.html#sunlight-1-line-618">line 618</a>
 			</li>
 		</ul>
 	</dd>
@@ -4427,7 +4450,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-698">line 698</a>
+				 <a href="futuquant.js.html#sunlight-1-line-235">line 235</a>
 			</li>
 		</ul>
 	</dd>
@@ -4624,7 +4647,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-799">line 799</a>
+				 <a href="futuquant.js.html#sunlight-1-line-336">line 336</a>
 			</li>
 		</ul>
 	</dd>
@@ -4774,12 +4797,10 @@ K线结构参考 KLine
             
                 <td class="default">
                 
-                    2018-01-01 00:00:00
-                
                 </td>
             
 
-            <td class="description last"><p>开始时间字符串</p></td>
+            <td class="description last"><p>开始时间字符串 2018-01-01 00:00:00</p></td>
         </tr>
 
     
@@ -4804,12 +4825,10 @@ K线结构参考 KLine
             
                 <td class="default">
                 
-                    2018-02-01 00:00:00
-                
                 </td>
             
 
-            <td class="description last"><p>结束时间字符串</p></td>
+            <td class="description last"><p>结束时间字符串 2018-02-01 00:00:00</p></td>
         </tr>
 
     
@@ -4854,7 +4873,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1061">line 1061</a>
+				 <a href="futuquant.js.html#sunlight-1-line-604">line 604</a>
 			</li>
 		</ul>
 	</dd>
@@ -5238,7 +5257,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-676">line 676</a>
+				 <a href="futuquant.js.html#sunlight-1-line-213">line 213</a>
 			</li>
 		</ul>
 	</dd>
@@ -5639,7 +5658,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-651">line 651</a>
+				 <a href="futuquant.js.html#sunlight-1-line-188">line 188</a>
 			</li>
 		</ul>
 	</dd>
@@ -5744,6 +5763,8 @@ K线结构参考 KLine
 
             
                 <td class="default">
+                
+                    1
                 
                 </td>
             
@@ -5869,7 +5890,7 @@ K线结构参考 KLine
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1264">line 1264</a>
+				 <a href="futuquant.js.html#sunlight-1-line-826">line 826</a>
 			</li>
 		</ul>
 	</dd>
@@ -6008,7 +6029,7 @@ Qot_UpdateBasicQot.proto - 3005推送股票基本报价</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-724">line 724</a>
+				 <a href="futuquant.js.html#sunlight-1-line-261">line 261</a>
 			</li>
 		</ul>
 	</dd>
@@ -6171,7 +6192,7 @@ Qot_UpdateBroker.proto - 3015推送经纪队列</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-892">line 892</a>
+				 <a href="futuquant.js.html#sunlight-1-line-435">line 435</a>
 			</li>
 		</ul>
 	</dd>
@@ -6280,7 +6301,7 @@ Qot_UpdateKL.proto - 3007推送K线</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-765">line 765</a>
+				 <a href="futuquant.js.html#sunlight-1-line-302">line 302</a>
 			</li>
 		</ul>
 	</dd>
@@ -6320,7 +6341,7 @@ Qot_UpdateKL.proto - 3007推送K线</p>
     </dt>
     <dd>
         
-<span class="param-type">Array.&lt;<a href="global.html#KLine">KLine</a>></span>
+<span class="param-type"><a href="global.html#QotUpdateKLResponse">QotUpdateKLResponse</a></span>
 
 
 
@@ -6393,7 +6414,7 @@ Qot_UpdateRT.proto - 3009推送分时</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-785">line 785</a>
+				 <a href="futuquant.js.html#sunlight-1-line-322">line 322</a>
 			</li>
 		</ul>
 	</dd>
@@ -6556,7 +6577,7 @@ Qot_UpdateTicker.proto - 3011推送逐笔</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-812">line 812</a>
+				 <a href="futuquant.js.html#sunlight-1-line-355">line 355</a>
 			</li>
 		</ul>
 	</dd>
@@ -6596,7 +6617,7 @@ Qot_UpdateTicker.proto - 3011推送逐笔</p>
     </dt>
     <dd>
         
-<span class="param-type">Array.&lt;<a href="global.html#Ticker">Ticker</a>></span>
+<span class="param-type"><a href="global.html#subQotUpdateTickerResponse">subQotUpdateTickerResponse</a></span>
 
 
 
@@ -6719,7 +6740,7 @@ Trd_UpdateOrder.proto - 2208推送订单更新</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1482">line 1482</a>
+				 <a href="futuquant.js.html#sunlight-1-line-1044">line 1044</a>
 			</li>
 		</ul>
 	</dd>
@@ -6882,7 +6903,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1512">line 1512</a>
+				 <a href="futuquant.js.html#sunlight-1-line-1074">line 1074</a>
 			</li>
 		</ul>
 	</dd>
@@ -6939,7 +6960,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
             
 <hr>
 <dt>
-    <h4 class="name" id="trdGetAccList"><span class="type-signature">&lt;async> </span>trdGetAccList(userID [, market])</h4>
+    <h4 class="name" id="trdGetAccList"><span class="type-signature">&lt;async> </span>trdGetAccList()</h4>
     
     
 </dt>
@@ -6956,112 +6977,6 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
     
 
     
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Argument</th>
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>userID</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>需要跟FutuOpenD登陆的牛牛用户ID一致，否则会返回失败</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>market</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#QotMarket">QotMarket</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    1
-                
-                </td>
-            
-
-            <td class="description last"><p>Qot_Common.QotMarket,股票市场</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
     
 
     
@@ -7100,7 +7015,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1217">line 1217</a>
+				 <a href="futuquant.js.html#sunlight-1-line-783">line 783</a>
 			</li>
 		</ul>
 	</dd>
@@ -7212,7 +7127,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1276">line 1276</a>
+				 <a href="futuquant.js.html#sunlight-1-line-838">line 838</a>
 			</li>
 		</ul>
 	</dd>
@@ -7374,7 +7289,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1547">line 1547</a>
+				 <a href="futuquant.js.html#sunlight-1-line-1109">line 1109</a>
 			</li>
 		</ul>
 	</dd>
@@ -7565,7 +7480,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1528">line 1528</a>
+				 <a href="futuquant.js.html#sunlight-1-line-1090">line 1090</a>
 			</li>
 		</ul>
 	</dd>
@@ -7988,7 +7903,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1312">line 1312</a>
+				 <a href="futuquant.js.html#sunlight-1-line-874">line 874</a>
 			</li>
 		</ul>
 	</dd>
@@ -8150,7 +8065,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1499">line 1499</a>
+				 <a href="futuquant.js.html#sunlight-1-line-1061">line 1061</a>
 			</li>
 		</ul>
 	</dd>
@@ -8336,7 +8251,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1332">line 1332</a>
+				 <a href="futuquant.js.html#sunlight-1-line-894">line 894</a>
 			</li>
 		</ul>
 	</dd>
@@ -8546,7 +8461,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1290">line 1290</a>
+				 <a href="futuquant.js.html#sunlight-1-line-852">line 852</a>
 			</li>
 		</ul>
 	</dd>
@@ -9044,7 +8959,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1457">line 1457</a>
+				 <a href="futuquant.js.html#sunlight-1-line-1019">line 1019</a>
 			</li>
 		</ul>
 	</dd>
@@ -9538,7 +9453,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1362">line 1362</a>
+				 <a href="futuquant.js.html#sunlight-1-line-924">line 924</a>
 			</li>
 		</ul>
 	</dd>
@@ -9772,7 +9687,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1390">line 1390</a>
+				 <a href="futuquant.js.html#sunlight-1-line-952">line 952</a>
 			</li>
 		</ul>
 	</dd>
@@ -9934,7 +9849,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1253">line 1253</a>
+				 <a href="futuquant.js.html#sunlight-1-line-815">line 815</a>
 			</li>
 		</ul>
 	</dd>
@@ -10135,7 +10050,7 @@ Trd_UpdateOrderFill.proto - 2218推送新成交</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1241">line 1241</a>
+				 <a href="futuquant.js.html#sunlight-1-line-803">line 803</a>
 			</li>
 		</ul>
 	</dd>
@@ -10224,7 +10139,7 @@ Trd_UpdateOrder.proto - 2208推送订单更新</p>
 		<ul class="dummy">
 			<li>
 				<a href="futuquant.js.html">futuquant.js</a>,
-				 <a href="futuquant.js.html#sunlight-1-line-1490">line 1490</a>
+				 <a href="futuquant.js.html#sunlight-1-line-1052">line 1052</a>
 			</li>
 		</ul>
 	</dd>
@@ -10303,7 +10218,7 @@ Trd_UpdateOrder.proto - 2208推送订单更新</p>
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
 	
-		on 2018-08-15T06:26:06+08:00
+		on 2018-08-22T00:44:00+08:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

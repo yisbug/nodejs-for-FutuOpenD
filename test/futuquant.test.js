@@ -16,6 +16,8 @@ const ft = new FtQuant({
   ip: '127.0.0.1',
   port: 11111,
   userID,
+  pwdMd5,
+  env: 1,
 });
 
 describe('FtQuant', () => {
@@ -31,6 +33,7 @@ describe('FtQuant', () => {
     await ft.setCommonTradeHeader(1, accID, 1); // 设置为港股的真实环境
   });
   after(async () => {
+    await ft.close();
     console.log('test end.');
   });
 
@@ -58,9 +61,8 @@ describe('FtQuant', () => {
   });
 
   it('qotGetTradeDate', async () => {
-    const res = await ft.qotGetTradeDate();
-    // console.log('qotGetTradeDate', res);
-    res.tradeDateList.length.should.be.eql(23);
+    const res = await ft.qotGetTradeDate(1, '2018-01-01 00:00:00', '2018-02-01 00:00:00');
+    res.length.should.be.eql(23);
   });
 
   it('trdGetMaxTrdQtys', async () => {
@@ -70,7 +72,6 @@ describe('FtQuant', () => {
 
   it('qotGetReference', async () => {
     const res = await ft.qotGetReference({ code: '00700', market: 1 });
-    // console.log('res', res.length, res[0]);
     (typeof res[0].basic !== 'undefined').should.be.true();
   });
 

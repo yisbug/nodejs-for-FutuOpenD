@@ -1,6 +1,6 @@
 {
   "name": "futuquant",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "FutuQuant-Nodejs",
   "main": "src/futuquant.js",
   "scripts": {
@@ -10,6 +10,7 @@
     "demo-es6": "node --experimental-modules demo.mjs",
     "demo-es5": "node demo.js",
     "pb": "pbjs -t json src/pb/*.proto > src/pb.json",
+    "log": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "pub": "npm run pb && npm run build && npm run doc && npm publish"
   },
   "repository": {
@@ -30,6 +31,7 @@
     "protobufjs": "^6.8.6"
   },
   "devDependencies": {
+    "conventional-changelog-cli": "^2.0.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.12.0",
