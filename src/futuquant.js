@@ -125,6 +125,16 @@ class FutuQuant {
     });
   }
   /**
+   * 断开连接
+   */
+  close() {
+    if (this.timerKeepLive) {
+      clearInterval(this.timerKeepLive);
+      this.socket.close();
+      this.inited = false;
+    }
+  }
+  /**
    * GetGlobalState.proto协议返回对象
    * @typedef GetGlobalStateResponse
    * @property {QotMarketState} marketHK Qot_Common.QotMarketState,港股主板市场状态
