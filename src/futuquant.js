@@ -69,6 +69,15 @@ class FutuQuant {
     this.timerKeepLive = null; // 保持心跳定时器
   }
   /**
+   * 初始化处理
+   */
+  async init() {
+    await this.initConnect();
+    await this.trdUnlockTrade(true, this.pwdMd5); // 解锁交易密码
+    const { accID } = (await this.trdGetAccList())[0]; // 获取交易账户
+    await this.setCommonTradeHeader(this.env, accID, this.market); // 设置为港股的真实环境
+  }
+  /**
    * 初始化连接，InitConnect.proto协议返回对象
    * @typedef InitConnectResponse
    * @property {number} serverVer FutuOpenD的版本号
