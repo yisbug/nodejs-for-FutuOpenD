@@ -1,45 +1,15 @@
 ## FutuQuant量化接口Nodejs版本
 
-基于 FutuQuant v3.2 底层协议封装的nodejs版本接口，数据格式使用 protobuf，使用前请先在本地或者服务端启动 FutuOpenD 服务。
+### 说明
 
-相关说明：
+基于 FutuQuant v3.2 底层协议封装的 nodejs 版本接口，数据格式使用 protobuf，使用前请先在本地或者服务端启动 FutuOpenD 服务。
 
 * 使用了async/await语法，要求nodejs版本v7.10.1以上，v7.5.1以上可以使用`--harmony`或者`--harmony-async-await`参数开启async/await的支持，v7.6.x 以可以不用开启 flag 直接使用。。
 * 底层协议基于FutuQuant v3.2，参考：[FutunnOpen/futuquant](https://github.com/FutunnOpen/futuquant/)。
-* 数据传输格式目前只支持protobuf。
+* 数据传输格式目前只支持 protobuf。
 * API文档相关：[https://yisbug.github.io/nodejs-for-FutuOpenD/doc/index.html](https://yisbug.github.io/nodejs-for-FutuOpenD/doc/index.html)
 
 > 为了方便使用，请注意部分接口参数及返回结果和富途官方版本不完全一致，详细请参考[API文档](https://yisbug.github.io/nodejs-for-FutuOpenD/doc/index.html)。
-
-### 更新
-
-#### 3.2.0 - 2018-8-15
-
-* opt: 修改版本号和官方 futuquant 的大版本号一致，即前两位3.2和官方保持一致，小版本号的更新用于bugfix 和其他的接口调整。
-* opt: 彻底去除 es6 modules，不再需要 babel 编译。
-* feat: 同步更新到官方最新版本 v3.2 。
-* feat: 增加 qotGetReference 获取正股相关股票接口
-* feat: 增加 trdGetMaxTrdQtys 获取最大交易数量接口
-* fix: 获取 k 线相关接口返回的数组增加兼容性支持。
-* feat: qotGetHistoryKLPoints 接口返回参数调整为直接返回数组
-* feat: qotGetTicker 接口返回参数调整为直接返回数组
-* feat: qotGetRT 接口返回参数调整为直接返回数组
-
-#### 0.2.0 - 2018.07.27
-
-* fix: 优化自定义logger部分
-* feat: 修改qotGetBasicQot方法直接返回数组
-* feat: 修改qotGetOrderBook方法直接返回对象，并增加sellList和buyList两个字段，等同于orderBookAskList和orderBookBidList
-* feat: 修改subQotUpdateOrderBook事件传递的摆盘结果，增加sellList和buyList两个字段，等同于orderBookAskList和orderBookBidList
-* feat: 修改qotGetBroker方法返回结果，增加sellList和buyList两个字段，等同于brokerAskList和brokerBidList
-* feat: 修改subQotUpdateBroker方法事件传递的经纪队列，增加sellList和buyList两个字段，等同于brokerAskList和brokerBidList
-* feat: 修改qotGetStaticInfo返回结果，直接返回数组
-* feat: 修改qotGetSecuritySnapShot返回结果，直接返回数组，并支持超过200支以上股票的查询。
-* feat: 新增按市价下单接口：trdPlaceOrderMarket(param)，直到交易完成成功为止，返回买入/卖出总价
-* feat: 新增取消注册订单更新接口：unsubTrdUpdateOrder()
-* docs: 其他调整
-
-更多请[点击查看更新日志](https://github.com/yisbug/futuquant/blob/master/CHANGELOG.md)
 
 ### 安装
 
@@ -101,8 +71,9 @@ const ftConfig = {
 const ft = new FtQuant(ftConfig, bunyanLogger);
 
 const init = async () => {
+  await ft.init(); // 初始化 ft 模块，包括调用initConnect、解锁交易接口、设置 TradeHeader
+
   let res = null;
-  await ft.init(); // 初始化 ft 模块
   res = await ft.getGlobalState(); // 获取全局状态
   console.log('getGlobalState', res);
 
@@ -129,3 +100,37 @@ npm test
 ### 广告
 
 如有需要，请填写推荐人牛牛号：5894668，谢谢！
+
+### 更新
+
+#### 最新更新
+
+最新更新 log 不再同步到 readme.md ，详情[请点击查看更新日志](https://github.com/yisbug/futuquant/blob/master/CHANGELOG.md)
+
+#### 3.2.0 - 2018-8-15
+
+* opt: 修改版本号和官方 futuquant 的大版本号一致，即前两位3.2和官方保持一致，小版本号的更新用于bugfix 和其他的接口调整。
+* opt: 彻底去除 es6 modules，不再需要 babel 编译。
+* feat: 同步更新到官方最新版本 v3.2 。
+* feat: 增加 qotGetReference 获取正股相关股票接口
+* feat: 增加 trdGetMaxTrdQtys 获取最大交易数量接口
+* fix: 获取 k 线相关接口返回的数组增加兼容性支持。
+* feat: qotGetHistoryKLPoints 接口返回参数调整为直接返回数组
+* feat: qotGetTicker 接口返回参数调整为直接返回数组
+* feat: qotGetRT 接口返回参数调整为直接返回数组
+
+#### 0.2.0 - 2018.07.27
+
+* fix: 优化自定义logger部分
+* feat: 修改qotGetBasicQot方法直接返回数组
+* feat: 修改qotGetOrderBook方法直接返回对象，并增加sellList和buyList两个字段，等同于orderBookAskList和orderBookBidList
+* feat: 修改subQotUpdateOrderBook事件传递的摆盘结果，增加sellList和buyList两个字段，等同于orderBookAskList和orderBookBidList
+* feat: 修改qotGetBroker方法返回结果，增加sellList和buyList两个字段，等同于brokerAskList和brokerBidList
+* feat: 修改subQotUpdateBroker方法事件传递的经纪队列，增加sellList和buyList两个字段，等同于brokerAskList和brokerBidList
+* feat: 修改qotGetStaticInfo返回结果，直接返回数组
+* feat: 修改qotGetSecuritySnapShot返回结果，直接返回数组，并支持超过200支以上股票的查询。
+* feat: 新增按市价下单接口：trdPlaceOrderMarket(param)，直到交易完成成功为止，返回买入/卖出总价
+* feat: 新增取消注册订单更新接口：unsubTrdUpdateOrder()
+* docs: 其他调整
+
+更多请[点击查看更新日志](https://github.com/yisbug/futuquant/blob/master/CHANGELOG.md)
