@@ -5,17 +5,17 @@ const fs = require('fs');
 const FtQuant = require('../src/futuquant');
 
 
-const FutuOpenDXMLPath = path.join(__dirname, '../../FutuOpenD_1.01_Mac/FutuOpenD.xml');
+const FutuOpenDXMLPath = path.join(__dirname, '../../FutuOpenD_1.01_Windows/FutuOpenD.xml');
 const ftOpenDConfig = fs.readFileSync(FutuOpenDXMLPath, { encoding: 'utf8' });
-const userID = ftOpenDConfig.match(/login_account>(\d*?)<\/login_account/)[1];
-const pwdMd5 = ftOpenDConfig.match(/trade_pwd_md5>(.*?)<\/trade_pwd_md5/)[1];
-
+const userID = ftOpenDConfig.match(/login_account>(\d*?)<\/login_account/);
+const pwdMd5 = ftOpenDConfig.match(/login_pwd_md5>(.*?)<\/login_pwd_md5/);
 console.log('userID', userID, 'pwdMd5', pwdMd5);
 
 const ft = new FtQuant({
   ip: '127.0.0.1',
   port: 11111,
   userID,
+  pwdMd5,
 });
 
 describe('FtQuant', () => {
@@ -27,7 +27,7 @@ describe('FtQuant', () => {
     (typeof res.connID !== 'undefined').should.be.true();
     (typeof res.connAESKey !== 'undefined').should.be.true();
     (typeof res.keepAliveInterval === 'number').should.be.true();
-    const { accID } = (await ft.trdGetAccList())[0];
+    const  accID   = await ft.trdGetAccList();
     await ft.setCommonTradeHeader(1, accID, 1); // 设置为港股的真实环境
   });
   after(async () => {

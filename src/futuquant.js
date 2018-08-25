@@ -40,7 +40,7 @@ class FutuQuant {
 
     this.logger = logger;
     this.market = market || 1; // 当前市场环境，1港股2美股3大陆市场4香港A股通市场
-    this.userID = userID;
+    this.loginUserID = userID;
     this.pwdMd5 = pwdMd5;
     this.params = params;
     this.env = env;
@@ -81,7 +81,7 @@ class FutuQuant {
    * 初始化连接，InitConnect.proto协议返回对象
    * @typedef InitConnectResponse
    * @property {number} serverVer FutuOpenD的版本号
-   * @property {number} loginUserID FutuOpenD登陆的牛牛用户ID
+   * @property {number} userID FutuOpenD登陆的牛牛用户ID
    * @property {number} connID 此连接的连接ID，连接的唯一标识
    * @property {string} connAESKey 此连接后续AES加密通信的Key，固定为16字节长字符串
    * @property {number} keepAliveInterval 心跳保活间隔
@@ -222,7 +222,7 @@ class FutuQuant {
    * @param {boolean} [isReqAllConn=false] 是否返回所有连接的订阅状态，默认false
    * @returns {QotGetSubInfoResponse}
    */
-  qotGetSubInfo(isReqAllConn = false) { // 3003获取订阅信息
+  async qotGetSubInfo(isReqAllConn = false) { // 3003获取订阅信息
     return this.socket.send('Qot_RegQotPush', {
       isReqAllConn,
     });

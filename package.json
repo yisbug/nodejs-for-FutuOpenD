@@ -1,5 +1,5 @@
 {
-  "name": "futuquant",
+  "name": "my-futuquant",
   "version": "3.2.0",
   "description": "FutuQuant-Nodejs",
   "main": "src/futuquant.js",
@@ -26,6 +26,7 @@
     "buffer": "^5.2.0",
     "bunyan": "^1.8.12",
     "bunyan-debug-stream": "^1.0.8",
+    "futuquant": "^3.2.1",
     "hex-sha1": "^1.0.2",
     "protobufjs": "^6.8.6"
   },
