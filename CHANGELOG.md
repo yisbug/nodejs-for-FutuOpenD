@@ -1,5 +1,11 @@
-<a name="3.2.1"></a>
-## [3.2.1](https://github.com/yisbug/futuquant/compare/0.2.0...3.2.1) (2018-08-21)
+<a name="3.2.2"></a>
+## [3.2.2](https://github.com/yisbug/futuquant/compare/0.2.0...3.2.2) (2018-08-28)
+
+
+### Bug Fixes
+
+* 获取交易账户列表支持模拟环境 ([a611c18](https://github.com/yisbug/futuquant/commit/a611c18))
+* 调整inited 的位置 ([e1a5f5e](https://github.com/yisbug/futuquant/commit/e1a5f5e))
 
 
 ### Features

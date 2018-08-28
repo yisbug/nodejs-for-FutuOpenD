@@ -93,42 +93,16 @@
 
 
     <section class="readme-section">
-        <article><h2>FutuQuant量化接口Nodejs版本</h2><p>基于 FutuQuant v3.2 底层协议封装的nodejs版本接口，数据格式使用 protobuf，使用前请先在本地或者服务端启动 FutuOpenD 服务。</p>
-<p>相关说明：</p>
+        <article><h2>FutuQuant量化接口Nodejs版本</h2><h3>说明</h3><p>基于 FutuQuant v3.2 底层协议封装的 nodejs 版本接口，数据格式使用 protobuf，使用前请先在本地或者服务端启动 FutuOpenD 服务。</p>
 <ul>
 <li>使用了async/await语法，要求nodejs版本v7.10.1以上，v7.5.1以上可以使用<code>--harmony</code>或者<code>--harmony-async-await</code>参数开启async/await的支持，v7.6.x 以可以不用开启 flag 直接使用。。</li>
 <li>底层协议基于FutuQuant v3.2，参考：<a href="https://github.com/FutunnOpen/futuquant/">FutunnOpen/futuquant</a>。</li>
-<li>数据传输格式目前只支持protobuf。</li>
+<li>数据传输格式目前只支持 protobuf。</li>
 <li>API文档相关：<a href="https://yisbug.github.io/nodejs-for-FutuOpenD/doc/index.html">https://yisbug.github.io/nodejs-for-FutuOpenD/doc/index.html</a></li>
 </ul>
 <blockquote>
 <p>为了方便使用，请注意部分接口参数及返回结果和富途官方版本不完全一致，详细请参考<a href="https://yisbug.github.io/nodejs-for-FutuOpenD/doc/index.html">API文档</a>。</p>
 </blockquote>
-<h3>更新</h3><h4>3.2.0 - 2018-8-15</h4><ul>
-<li>opt: 修改版本号和官方 futuquant 的大版本号一致，即前两位3.2和官方保持一致，小版本号的更新用于bugfix 和其他的接口调整。</li>
-<li>opt: 彻底去除 es6 modules，不再需要 babel 编译。</li>
-<li>feat: 同步更新到官方最新版本 v3.2 。</li>
-<li>feat: 增加 qotGetReference 获取正股相关股票接口</li>
-<li>feat: 增加 trdGetMaxTrdQtys 获取最大交易数量接口</li>
-<li>fix: 获取 k 线相关接口返回的数组增加兼容性支持。</li>
-<li>feat: qotGetHistoryKLPoints 接口返回参数调整为直接返回数组</li>
-<li>feat: qotGetTicker 接口返回参数调整为直接返回数组</li>
-<li>feat: qotGetRT 接口返回参数调整为直接返回数组</li>
-</ul>
-<h4>0.2.0 - 2018.07.27</h4><ul>
-<li>fix: 优化自定义logger部分</li>
-<li>feat: 修改qotGetBasicQot方法直接返回数组</li>
-<li>feat: 修改qotGetOrderBook方法直接返回对象，并增加sellList和buyList两个字段，等同于orderBookAskList和orderBookBidList</li>
-<li>feat: 修改subQotUpdateOrderBook事件传递的摆盘结果，增加sellList和buyList两个字段，等同于orderBookAskList和orderBookBidList</li>
-<li>feat: 修改qotGetBroker方法返回结果，增加sellList和buyList两个字段，等同于brokerAskList和brokerBidList</li>
-<li>feat: 修改subQotUpdateBroker方法事件传递的经纪队列，增加sellList和buyList两个字段，等同于brokerAskList和brokerBidList</li>
-<li>feat: 修改qotGetStaticInfo返回结果，直接返回数组</li>
-<li>feat: 修改qotGetSecuritySnapShot返回结果，直接返回数组，并支持超过200支以上股票的查询。</li>
-<li>feat: 新增按市价下单接口：trdPlaceOrderMarket(param)，直到交易完成成功为止，返回买入/卖出总价</li>
-<li>feat: 新增取消注册订单更新接口：unsubTrdUpdateOrder()</li>
-<li>docs: 其他调整</li>
-</ul>
-<p>更多请<a href="https://github.com/yisbug/futuquant/blob/master/CHANGELOG.md">点击查看更新日志</a></p>
 <h3>安装</h3><pre class="prettyprint source"><code>npm install futuquant --save</code></pre><p>或者</p>
 <pre class="prettyprint source"><code>yarn add futuquant</code></pre><h3>使用</h3><pre class="prettyprint source lang-javascript"><code>/**
 -  **所有行情相关协议获取数据都需要先通过（1005）协议订阅成功后才能查询**
@@ -175,8 +149,9 @@ const ftConfig = {
 const ft = new FtQuant(ftConfig, bunyanLogger);
 
 const init = async () => {
+  await ft.init(); // 初始化 ft 模块，包括调用initConnect、解锁交易接口、设置 TradeHeader
+
   let res = null;
-  await ft.init(); // 初始化 ft 模块
   res = await ft.getGlobalState(); // 获取全局状态
   console.log('getGlobalState', res);
 
@@ -189,7 +164,33 @@ const init = async () => {
 
 init();</code></pre><h3>测试</h3><p>请先修改<code>test/futuquant.test.js</code>中<code>FutuOpenDXMLPath</code>的路径，然后执行<code>npm install</code>或<code>yarn</code>安装相关依赖。</p>
 <p>运行测试：</p>
-<pre class="prettyprint source"><code>npm test</code></pre><h3>广告</h3><p>如有需要，请填写推荐人牛牛号：5894668，谢谢！</p></article>
+<pre class="prettyprint source"><code>npm test</code></pre><h3>广告</h3><p>如有需要，请填写推荐人牛牛号：5894668，谢谢！</p>
+<h3>更新</h3><h4>最新更新</h4><p>最新更新 log 不再同步到 readme.md ，详情<a href="https://github.com/yisbug/futuquant/blob/master/CHANGELOG.md">请点击查看更新日志</a></p>
+<h4>3.2.0 - 2018-8-15</h4><ul>
+<li>opt: 修改版本号和官方 futuquant 的大版本号一致，即前两位3.2和官方保持一致，小版本号的更新用于bugfix 和其他的接口调整。</li>
+<li>opt: 彻底去除 es6 modules，不再需要 babel 编译。</li>
+<li>feat: 同步更新到官方最新版本 v3.2 。</li>
+<li>feat: 增加 qotGetReference 获取正股相关股票接口</li>
+<li>feat: 增加 trdGetMaxTrdQtys 获取最大交易数量接口</li>
+<li>fix: 获取 k 线相关接口返回的数组增加兼容性支持。</li>
+<li>feat: qotGetHistoryKLPoints 接口返回参数调整为直接返回数组</li>
+<li>feat: qotGetTicker 接口返回参数调整为直接返回数组</li>
+<li>feat: qotGetRT 接口返回参数调整为直接返回数组</li>
+</ul>
+<h4>0.2.0 - 2018.07.27</h4><ul>
+<li>fix: 优化自定义logger部分</li>
+<li>feat: 修改qotGetBasicQot方法直接返回数组</li>
+<li>feat: 修改qotGetOrderBook方法直接返回对象，并增加sellList和buyList两个字段，等同于orderBookAskList和orderBookBidList</li>
+<li>feat: 修改subQotUpdateOrderBook事件传递的摆盘结果，增加sellList和buyList两个字段，等同于orderBookAskList和orderBookBidList</li>
+<li>feat: 修改qotGetBroker方法返回结果，增加sellList和buyList两个字段，等同于brokerAskList和brokerBidList</li>
+<li>feat: 修改subQotUpdateBroker方法事件传递的经纪队列，增加sellList和buyList两个字段，等同于brokerAskList和brokerBidList</li>
+<li>feat: 修改qotGetStaticInfo返回结果，直接返回数组</li>
+<li>feat: 修改qotGetSecuritySnapShot返回结果，直接返回数组，并支持超过200支以上股票的查询。</li>
+<li>feat: 新增按市价下单接口：trdPlaceOrderMarket(param)，直到交易完成成功为止，返回买入/卖出总价</li>
+<li>feat: 新增取消注册订单更新接口：unsubTrdUpdateOrder()</li>
+<li>docs: 其他调整</li>
+</ul>
+<p>更多请<a href="https://github.com/yisbug/futuquant/blob/master/CHANGELOG.md">点击查看更新日志</a></p></article>
     </section>
 
 
@@ -235,7 +236,7 @@ init();</code></pre><h3>测试</h3><p>请先修改<code>test/futuquant.test.js</
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
 	
-		on 2018-08-22T00:44:00+08:00
+		on 2018-08-28T13:24:55+08:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

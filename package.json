@@ -1,6 +1,6 @@
 {
   "name": "futuquant",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "FutuQuant-Nodejs",
   "main": "src/futuquant.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "demo-es5": "node demo.js",
     "pb": "pbjs -t json src/pb/*.proto > src/pb.json",
     "log": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
-    "pub": "npm run pb && npm run build && npm run doc && npm publish"
+    "pub": "npm run log && npm run doc && npm publish"
   },
   "repository": {
     "type": "git",
