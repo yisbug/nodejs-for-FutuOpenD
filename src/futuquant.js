@@ -74,7 +74,9 @@ class FutuQuant {
   async init() {
     if (this.inited) return;
     await this.initConnect();
-    await this.trdUnlockTrade(true, this.pwdMd5); // 解锁交易密码
+    await this.limitExecTimes(30 * 1000, 10, async () => {
+      await this.trdUnlockTrade(true, this.pwdMd5); // 解锁交易密码
+    });
     const { accID } = (await this.trdGetAccList())[0]; // 获取交易账户
     await this.setCommonTradeHeader(this.env, accID, this.market); // 设置为港股的真实环境
     this.inited = true;
@@ -787,7 +789,7 @@ class FutuQuant {
     } = (await this.socket.send('Trd_GetAccList', {
       userID: this.userID,
     }));
-    return accList.filter(acc => acc.trdMarketAuthList.includes(this.market));
+    return accList.filter(acc => acc.trdMarketAuthList.includes(this.market) && acc.trdEnv === this.env);
   }
   /**
    * Trd_UnlockTrade.proto - 2005解锁或锁定交易
