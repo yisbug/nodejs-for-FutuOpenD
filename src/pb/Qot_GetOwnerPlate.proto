@@ -1,18 +1,23 @@
 syntax = "proto2";
-package Qot_GetPlateSet;
+package Qot_GetOwnerPlate;
 
 import "Common.proto";
 import "Qot_Common.proto";
 
 message C2S
 {
-	required int32 market = 1; //Qot_Common.QotMarket,股票市场
-	required int32 plateSetType = 2; //Qot_Common.PlateSetType,板块集合的类型
+	repeated Qot_Common.Security securityList = 1; //股票
+}
+
+message SecurityOwnerPlate
+{
+	required Qot_Common.Security security = 1; //股票
+	repeated Qot_Common.PlateInfo plateInfoList = 2; //所属板块
 }
 
 message S2C
 {
-	repeated Qot_Common.PlateInfo plateInfoList = 1; //板块集合下的板块信息
+	repeated SecurityOwnerPlate ownerPlateList = 1; //所属板块信息
 }
 
 message Request

@@ -138,7 +138,6 @@
             "QotMarket_HK_Security": 1,
             "QotMarket_HK_Future": 2,
             "QotMarket_US_Security": 11,
-            "QotMarket_US_Option": 12,
             "QotMarket_CNSH_Security": 21,
             "QotMarket_CNSZ_Security": 22
           }
@@ -162,7 +161,8 @@
             "PlateSetType_All": 0,
             "PlateSetType_Industry": 1,
             "PlateSetType_Region": 2,
-            "PlateSetType_Concept": 3
+            "PlateSetType_Concept": 3,
+            "PlateSetType_Other": 4
           }
         },
         "WarrantType": {
@@ -172,6 +172,13 @@
             "WarrantType_Sell": 2,
             "WarrantType_Bull": 3,
             "WarrantType_Bear": 4
+          }
+        },
+        "OptionType": {
+          "values": {
+            "OptionType_Unknown": 0,
+            "OptionType_Call": 1,
+            "OptionType_Put": 2
           }
         },
         "QotMarketState": {
@@ -252,7 +259,8 @@
             "SubType_Broker": 14,
             "SubType_KL_Qurater": 15,
             "SubType_KL_Year": 16,
-            "SubType_KL_3Min": 17
+            "SubType_KL_3Min": 17,
+            "SubType_OrderDetail": 18
           }
         },
         "TickerDirection": {
@@ -303,6 +311,22 @@
             "DarkStatus_None": 0,
             "DarkStatus_Trading": 1,
             "DarkStatus_End": 2
+          }
+        },
+        "HolderCategory": {
+          "values": {
+            "HolderCategory_Unknow": 0,
+            "HolderCategory_Agency": 1,
+            "HolderCategory_Fund": 2,
+            "HolderCategory_SeniorManager": 3
+          }
+        },
+        "PushDataType": {
+          "values": {
+            "PushDataType_Unknow": 0,
+            "PushDataType_Realtime": 1,
+            "PushDataType_ByDisConn": 2,
+            "PushDataType_Cache": 3
           }
         },
         "Security": {
@@ -370,6 +394,60 @@
             "changeRate": {
               "type": "double",
               "id": 12
+            }
+          }
+        },
+        "OptionBasicQotExData": {
+          "fields": {
+            "strikePrice": {
+              "rule": "required",
+              "type": "double",
+              "id": 1
+            },
+            "contractSize": {
+              "rule": "required",
+              "type": "int32",
+              "id": 2
+            },
+            "openInterest": {
+              "rule": "required",
+              "type": "int32",
+              "id": 3
+            },
+            "impliedVolatility": {
+              "rule": "required",
+              "type": "double",
+              "id": 4
+            },
+            "premium": {
+              "rule": "required",
+              "type": "double",
+              "id": 5
+            },
+            "delta": {
+              "rule": "required",
+              "type": "double",
+              "id": 6
+            },
+            "gamma": {
+              "rule": "required",
+              "type": "double",
+              "id": 7
+            },
+            "vega": {
+              "rule": "required",
+              "type": "double",
+              "id": 8
+            },
+            "theta": {
+              "rule": "required",
+              "type": "double",
+              "id": 9
+            },
+            "rho": {
+              "rule": "required",
+              "type": "double",
+              "id": 10
             }
           }
         },
@@ -448,6 +526,10 @@
             "darkStatus": {
               "type": "int32",
               "id": 15
+            },
+            "optionExData": {
+              "type": "OptionBasicQotExData",
+              "id": 16
             }
           }
         },
@@ -521,6 +603,10 @@
               "rule": "required",
               "type": "string",
               "id": 6
+            },
+            "delisting": {
+              "type": "bool",
+              "id": 7
             }
           }
         },
@@ -538,6 +624,40 @@
             }
           }
         },
+        "OptionStaticExData": {
+          "fields": {
+            "type": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "owner": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 2
+            },
+            "strikeTime": {
+              "rule": "required",
+              "type": "string",
+              "id": 3
+            },
+            "strikePrice": {
+              "rule": "required",
+              "type": "double",
+              "id": 4
+            },
+            "suspend": {
+              "rule": "required",
+              "type": "bool",
+              "id": 5
+            },
+            "market": {
+              "rule": "required",
+              "type": "string",
+              "id": 6
+            }
+          }
+        },
         "SecurityStaticInfo": {
           "fields": {
             "basic": {
@@ -548,6 +668,10 @@
             "warrantExData": {
               "type": "WarrantStaticExData",
               "id": 2
+            },
+            "optionExData": {
+              "type": "OptionStaticExData",
+              "id": 3
             }
           }
         },
@@ -613,6 +737,10 @@
             "typeSign": {
               "type": "int32",
               "id": 9
+            },
+            "pushDataType": {
+              "type": "int32",
+              "id": 10
             }
           }
         },
@@ -632,6 +760,57 @@
               "rule": "required",
               "type": "int32",
               "id": 3
+            }
+          }
+        },
+        "OrderDetail": {
+          "fields": {
+            "orderCount": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "orderVol": {
+              "rule": "repeated",
+              "type": "double",
+              "id": 2,
+              "options": {
+                "packed": false
+              }
+            }
+          }
+        },
+        "ShareHoldingChange": {
+          "fields": {
+            "holderName": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "holdingQty": {
+              "rule": "required",
+              "type": "double",
+              "id": 2
+            },
+            "holdingRatio": {
+              "rule": "required",
+              "type": "double",
+              "id": 3
+            },
+            "changeQty": {
+              "rule": "required",
+              "type": "double",
+              "id": 4
+            },
+            "changeRatio": {
+              "rule": "required",
+              "type": "double",
+              "id": 5
+            },
+            "time": {
+              "rule": "required",
+              "type": "string",
+              "id": 6
             }
           }
         },
@@ -664,6 +843,24 @@
             "isOwnConnData": {
               "rule": "required",
               "type": "bool",
+              "id": 3
+            }
+          }
+        },
+        "PlateInfo": {
+          "fields": {
+            "plate": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 1
+            },
+            "name": {
+              "rule": "required",
+              "type": "string",
+              "id": 2
+            },
+            "plateType": {
+              "type": "int32",
               "id": 3
             }
           }
@@ -1237,6 +1434,79 @@
         }
       }
     },
+    "Qot_GetHoldingChangeList": {
+      "nested": {
+        "C2S": {
+          "fields": {
+            "security": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 1
+            },
+            "holderCategory": {
+              "rule": "required",
+              "type": "int32",
+              "id": 2
+            },
+            "beginTime": {
+              "type": "string",
+              "id": 3
+            },
+            "endTime": {
+              "type": "string",
+              "id": 4
+            }
+          }
+        },
+        "S2C": {
+          "fields": {
+            "security": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 1
+            },
+            "holdingChangeList": {
+              "rule": "repeated",
+              "type": "Qot_Common.ShareHoldingChange",
+              "id": 2
+            }
+          }
+        },
+        "Request": {
+          "fields": {
+            "c2s": {
+              "rule": "required",
+              "type": "C2S",
+              "id": 1
+            }
+          }
+        },
+        "Response": {
+          "fields": {
+            "retType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "default": -400
+              }
+            },
+            "retMsg": {
+              "type": "string",
+              "id": 2
+            },
+            "errCode": {
+              "type": "int32",
+              "id": 3
+            },
+            "s2c": {
+              "type": "S2C",
+              "id": 4
+            }
+          }
+        }
+      }
+    },
     "Qot_GetKL": {
       "nested": {
         "C2S": {
@@ -1312,6 +1582,112 @@
         }
       }
     },
+    "Qot_GetOptionChain": {
+      "nested": {
+        "OptionCondType": {
+          "values": {
+            "OptionCondType_Unknow": 0,
+            "OptionCondType_WithIn": 1,
+            "OptionCondType_Outside": 2
+          }
+        },
+        "C2S": {
+          "fields": {
+            "owner": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 1
+            },
+            "type": {
+              "type": "int32",
+              "id": 2
+            },
+            "condition": {
+              "type": "int32",
+              "id": 3
+            },
+            "beginTime": {
+              "rule": "required",
+              "type": "string",
+              "id": 4
+            },
+            "endTime": {
+              "rule": "required",
+              "type": "string",
+              "id": 5
+            }
+          }
+        },
+        "OptionItem": {
+          "fields": {
+            "call": {
+              "type": "Qot_Common.SecurityStaticInfo",
+              "id": 1
+            },
+            "put": {
+              "type": "Qot_Common.SecurityStaticInfo",
+              "id": 2
+            }
+          }
+        },
+        "OptionChain": {
+          "fields": {
+            "strikeTime": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "option": {
+              "rule": "repeated",
+              "type": "OptionItem",
+              "id": 2
+            }
+          }
+        },
+        "S2C": {
+          "fields": {
+            "optionChain": {
+              "rule": "repeated",
+              "type": "OptionChain",
+              "id": 1
+            }
+          }
+        },
+        "Request": {
+          "fields": {
+            "c2s": {
+              "rule": "required",
+              "type": "C2S",
+              "id": 1
+            }
+          }
+        },
+        "Response": {
+          "fields": {
+            "retType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "default": -400
+              }
+            },
+            "retMsg": {
+              "type": "string",
+              "id": 2
+            },
+            "errCode": {
+              "type": "int32",
+              "id": 3
+            },
+            "s2c": {
+              "type": "S2C",
+              "id": 4
+            }
+          }
+        }
+      }
+    },
     "Qot_GetOrderBook": {
       "nested": {
         "C2S": {
@@ -1344,6 +1720,140 @@
               "rule": "repeated",
               "type": "Qot_Common.OrderBook",
               "id": 3
+            }
+          }
+        },
+        "Request": {
+          "fields": {
+            "c2s": {
+              "rule": "required",
+              "type": "C2S",
+              "id": 1
+            }
+          }
+        },
+        "Response": {
+          "fields": {
+            "retType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "default": -400
+              }
+            },
+            "retMsg": {
+              "type": "string",
+              "id": 2
+            },
+            "errCode": {
+              "type": "int32",
+              "id": 3
+            },
+            "s2c": {
+              "type": "S2C",
+              "id": 4
+            }
+          }
+        }
+      }
+    },
+    "Qot_GetOrderDetail": {
+      "nested": {
+        "C2S": {
+          "fields": {
+            "security": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 1
+            }
+          }
+        },
+        "S2C": {
+          "fields": {
+            "security": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 1
+            },
+            "orderDetailAsk": {
+              "rule": "required",
+              "type": "Qot_Common.OrderDetail",
+              "id": 2
+            },
+            "orderDetailBid": {
+              "rule": "required",
+              "type": "Qot_Common.OrderDetail",
+              "id": 3
+            }
+          }
+        },
+        "Request": {
+          "fields": {
+            "c2s": {
+              "rule": "required",
+              "type": "C2S",
+              "id": 1
+            }
+          }
+        },
+        "Response": {
+          "fields": {
+            "retType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "default": -400
+              }
+            },
+            "retMsg": {
+              "type": "string",
+              "id": 2
+            },
+            "errCode": {
+              "type": "int32",
+              "id": 3
+            },
+            "s2c": {
+              "type": "S2C",
+              "id": 4
+            }
+          }
+        }
+      }
+    },
+    "Qot_GetOwnerPlate": {
+      "nested": {
+        "C2S": {
+          "fields": {
+            "securityList": {
+              "rule": "repeated",
+              "type": "Qot_Common.Security",
+              "id": 1
+            }
+          }
+        },
+        "SecurityOwnerPlate": {
+          "fields": {
+            "security": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 1
+            },
+            "plateInfoList": {
+              "rule": "repeated",
+              "type": "Qot_Common.PlateInfo",
+              "id": 2
+            }
+          }
+        },
+        "S2C": {
+          "fields": {
+            "ownerPlateList": {
+              "rule": "repeated",
+              "type": "SecurityOwnerPlate",
+              "id": 1
             }
           }
         },
@@ -1453,25 +1963,11 @@
             }
           }
         },
-        "PlateInfo": {
-          "fields": {
-            "plate": {
-              "rule": "required",
-              "type": "Qot_Common.Security",
-              "id": 1
-            },
-            "name": {
-              "rule": "required",
-              "type": "string",
-              "id": 2
-            }
-          }
-        },
         "S2C": {
           "fields": {
             "plateInfoList": {
               "rule": "repeated",
-              "type": "PlateInfo",
+              "type": "Qot_Common.PlateInfo",
               "id": 1
             }
           }
@@ -1884,6 +2380,11 @@
               "rule": "required",
               "type": "double",
               "id": 11
+            },
+            "peTTMRate": {
+              "rule": "required",
+              "type": "double",
+              "id": 12
             }
           }
         },
@@ -1950,6 +2451,75 @@
               "id": 12
             },
             "premium": {
+              "rule": "required",
+              "type": "double",
+              "id": 13
+            }
+          }
+        },
+        "OptionSnapshotExData": {
+          "fields": {
+            "type": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "owner": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 2
+            },
+            "strikeTime": {
+              "rule": "required",
+              "type": "string",
+              "id": 3
+            },
+            "strikePrice": {
+              "rule": "required",
+              "type": "double",
+              "id": 4
+            },
+            "contractSize": {
+              "rule": "required",
+              "type": "int32",
+              "id": 5
+            },
+            "openInterest": {
+              "rule": "required",
+              "type": "int32",
+              "id": 6
+            },
+            "impliedVolatility": {
+              "rule": "required",
+              "type": "double",
+              "id": 7
+            },
+            "premium": {
+              "rule": "required",
+              "type": "double",
+              "id": 8
+            },
+            "delta": {
+              "rule": "required",
+              "type": "double",
+              "id": 9
+            },
+            "gamma": {
+              "rule": "required",
+              "type": "double",
+              "id": 10
+            },
+            "vega": {
+              "rule": "required",
+              "type": "double",
+              "id": 11
+            },
+            "theta": {
+              "rule": "required",
+              "type": "double",
+              "id": 12
+            },
+            "rho": {
               "rule": "required",
               "type": "double",
               "id": 13
@@ -2049,6 +2619,10 @@
             "warrantExData": {
               "type": "WarrantSnapshotExData",
               "id": 3
+            },
+            "optionExData": {
+              "type": "OptionSnapshotExData",
+              "id": 4
             }
           }
         },
@@ -2524,6 +3098,102 @@
         }
       }
     },
+    "Qot_RequestHistoryKL": {
+      "nested": {
+        "C2S": {
+          "fields": {
+            "rehabType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "klType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 2
+            },
+            "security": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 3
+            },
+            "beginTime": {
+              "rule": "required",
+              "type": "string",
+              "id": 4
+            },
+            "endTime": {
+              "rule": "required",
+              "type": "string",
+              "id": 5
+            },
+            "maxAckKLNum": {
+              "type": "int32",
+              "id": 6
+            },
+            "needKLFieldsFlag": {
+              "type": "int64",
+              "id": 7
+            },
+            "nextReqKey": {
+              "type": "bytes",
+              "id": 8
+            }
+          }
+        },
+        "S2C": {
+          "fields": {
+            "security": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 1
+            },
+            "klList": {
+              "rule": "repeated",
+              "type": "Qot_Common.KLine",
+              "id": 2
+            },
+            "nextReqKey": {
+              "type": "bytes",
+              "id": 3
+            }
+          }
+        },
+        "Request": {
+          "fields": {
+            "c2s": {
+              "rule": "required",
+              "type": "C2S",
+              "id": 1
+            }
+          }
+        },
+        "Response": {
+          "fields": {
+            "retType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "default": -400
+              }
+            },
+            "retMsg": {
+              "type": "string",
+              "id": 2
+            },
+            "errCode": {
+              "type": "int32",
+              "id": 3
+            },
+            "s2c": {
+              "type": "S2C",
+              "id": 4
+            }
+          }
+        }
+      }
+    },
     "Qot_Sub": {
       "nested": {
         "C2S": {
@@ -2755,6 +3425,53 @@
             "orderBookBidList": {
               "rule": "repeated",
               "type": "Qot_Common.OrderBook",
+              "id": 3
+            }
+          }
+        },
+        "Response": {
+          "fields": {
+            "retType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "default": -400
+              }
+            },
+            "retMsg": {
+              "type": "string",
+              "id": 2
+            },
+            "errCode": {
+              "type": "int32",
+              "id": 3
+            },
+            "s2c": {
+              "type": "S2C",
+              "id": 4
+            }
+          }
+        }
+      }
+    },
+    "Qot_UpdateOrderDetail": {
+      "nested": {
+        "S2C": {
+          "fields": {
+            "security": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 1
+            },
+            "orderDetailAsk": {
+              "rule": "required",
+              "type": "Qot_Common.OrderDetail",
+              "id": 2
+            },
+            "orderDetailBid": {
+              "rule": "required",
+              "type": "Qot_Common.OrderDetail",
               "id": 3
             }
           }

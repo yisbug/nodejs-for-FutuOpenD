@@ -1,4 +1,4 @@
-syntax = "proto2";
+﻿syntax = "proto2";
 package Qot_Common;
 
 import "Common.proto";
@@ -9,7 +9,6 @@ enum QotMarket
     QotMarket_HK_Security = 1; //港股
     QotMarket_HK_Future = 2; //港期货(目前是恒指的当月、下月期货行情)
     QotMarket_US_Security = 11; //美股
-    QotMarket_US_Option = 12; //美期权,暂时不支持期权
     QotMarket_CNSH_Security = 21; //沪股
     QotMarket_CNSZ_Security = 22; //深股
 }
@@ -34,6 +33,7 @@ enum PlateSetType
 	PlateSetType_Industry = 1; //行业板块
 	PlateSetType_Region = 2; //地域板块,港美股市场的地域分类数据暂为空
 	PlateSetType_Concept = 3; //概念板块
+	PlateSetType_Other = 4; //其他板块, 仅用于3207（获取股票所属板块）协议返回,不可作为其他协议的请求参数
 }
 
 enum WarrantType
@@ -43,6 +43,13 @@ enum WarrantType
 	WarrantType_Sell = 2; //认沽
 	WarrantType_Bull = 3; //牛
 	WarrantType_Bear = 4; //熊
+};
+
+enum OptionType
+{
+	OptionType_Unknown = 0; //未知
+	OptionType_Call = 1; //涨
+	OptionType_Put = 2; //跌
 };
 
 enum QotMarketState
@@ -128,6 +135,7 @@ enum SubType
 	SubType_KL_Qurater = 15; //季K
 	SubType_KL_Year = 16; //年K
 	SubType_KL_3Min = 17; //3分K
+	SubType_OrderDetail = 18; //委托明细
 }
 
 enum TickerDirection
@@ -180,6 +188,23 @@ enum DarkStatus
 	DarkStatus_End = 2; //暗盘交易结束
 }
 
+enum HolderCategory
+{
+	HolderCategory_Unknow = 0; //未知
+	HolderCategory_Agency = 1; //机构
+	HolderCategory_Fund = 2; //基金
+	HolderCategory_SeniorManager = 3; //高管
+}
+
+//推送数据的分类，目前只有逐笔在使用
+enum PushDataType
+{
+	PushDataType_Unknow = 0;
+	PushDataType_Realtime = 1; //实时推送的数据
+	PushDataType_ByDisConn = 2; //对后台行情连接断开期间拉取补充的数据 最多750个
+	PushDataType_Cache = 3; //非实时非连接断开补充数据
+}
+
  //两个字段确定一支股票
 message Security
 {
@@ -203,6 +228,20 @@ message KLine
 	optional double changeRate = 12; //涨跌幅
 }
 
+message OptionBasicQotExData
+{
+	required double strikePrice = 1; //行权价
+	required int32 contractSize = 2; //每份合约数
+	required int32 openInterest = 3; //未平仓合约数
+	required double impliedVolatility = 4; //隐含波动率
+	required double premium = 5; //溢价
+	required double delta = 6; //希腊值 Delta
+    required double gamma = 7; //希腊值 Gamma
+	required double vega = 8; //希腊值 Vega
+    required double theta = 9; //希腊值 Theta
+    required double rho = 10; //希腊值 Rho
+}
+
 message BasicQot
 {
 	required Security security = 1; //股票
@@ -220,6 +259,8 @@ message BasicQot
 	required double turnoverRate = 13; //换手率
 	required double amplitude = 14; //振幅
 	optional int32 darkStatus = 15; //DarkStatus, 暗盘交易状态
+
+	optional OptionBasicQotExData optionExData = 16; //期权特有字段
 }
 
 message TimeShare
@@ -238,10 +279,11 @@ message SecurityStaticBasic
 {
 	required Qot_Common.Security security = 1; //股票
 	required int64 id = 2; //股票ID
-	required int32 lotSize = 3; //每手数量
+	required int32 lotSize = 3; //每手数量,期权类型表示一份合约的股数
 	required int32 secType = 4; //Qot_Common.SecurityType,股票类型
 	required string name = 5; //股票名字
 	required string listTime = 6; //上市时间字符串
+	optional bool delisting = 7; //是否退市
 }
 
 message WarrantStaticExData
@@ -250,10 +292,21 @@ message WarrantStaticExData
 	required Qot_Common.Security owner = 2; //所属正股
 }
 
+message OptionStaticExData
+{
+	required int32 type = 1; //Qot_Common.OptionType,期权
+	required Qot_Common.Security owner = 2; //标的股
+	required string strikeTime = 3; //行权日
+	required double strikePrice = 4; //行权价
+	required bool suspend = 5; //是否停牌
+	required string market = 6; //发行市场名字
+}
+
 message SecurityStaticInfo
 {
 	required SecurityStaticBasic basic = 1; //基本股票静态信息
 	optional WarrantStaticExData warrantExData = 2; //窝轮额外股票静态信息
+	optional OptionStaticExData optionExData = 3; //期权额外股票静态信息
 }
 
 message Broker
@@ -274,6 +327,7 @@ message Ticker
 	optional double recvTime = 7; //收到推送数据的本地时间戳，用于定位延迟
 	optional int32 type = 8; //TickerType, 逐笔类型
 	optional int32 typeSign = 9; //逐笔类型符号
+	optional int32 pushDataType = 10; //用于区分推送情况
 }
 
 message OrderBook
@@ -281,6 +335,23 @@ message OrderBook
 	required double price = 1; //委托价格
 	required int64 volume = 2; //委托数量
 	required int32 orederCount = 3; //委托订单个数
+}
+
+message OrderDetail
+{
+	required int32 orderCount = 1; //委托订单个数
+	repeated double orderVol = 2; //每笔委托的委托量，注意：当前只会返回最多前50笔委托的委托数量
+}
+
+//持股变动
+message ShareHoldingChange
+{
+    required string holderName = 1; //持有者名称（机构名称 或 基金名称 或 高管姓名）
+    required double holdingQty = 2; //当前持股数量
+    required double holdingRatio = 3; //当前持股百分比
+    required double changeQty = 4; //较上一次变动数量
+	required double changeRatio = 5; //较上一次变动百分比（是相对于自身的比例，而不是总的。如总股本1万股，持有100股，持股百分比是1%，卖掉50股，变动比例是50%，而不是0.5%）
+    required string time = 6; //发布时间(YYYY-MM-DD HH:MM:SS字符串)
 }
 
 message SubInfo
@@ -294,4 +365,11 @@ message ConnSubInfo
 	repeated SubInfo subInfoList = 1; //该连接订阅信息
 	required int32 usedQuota = 2; //该连接已经使用的订阅额度
 	required bool isOwnConnData = 3; //用于区分是否是自己连接的数据
+}
+
+message PlateInfo
+{
+	required Qot_Common.Security plate = 1; //板块
+	required string name = 2; //板块名字
+	optional int32 plateType = 3; //PlateSetType 板块类型, 仅3207（获取股票所属板块）协议返回该字段
 }

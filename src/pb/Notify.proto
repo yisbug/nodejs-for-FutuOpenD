@@ -6,7 +6,7 @@ import "Common.proto";
 enum NotifyType
 {
 	NotifyType_None = 0; //无
-	NotifyType_GtwEvent = 1; //Gateway运行事件通知
+	NotifyType_GtwEvent = 1; //OpenD运行事件通知
 }
 
 enum GtwEventType

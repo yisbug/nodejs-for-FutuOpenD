@@ -5,7 +5,7 @@ const fs = require('fs');
 const FtQuant = require('../src/futuquant');
 
 
-const FutuOpenDXMLPath = path.join(__dirname, '../../FutuOpenD_1.01_Mac/FutuOpenD.xml');
+const FutuOpenDXMLPath = path.join(__dirname, '../../FutuOpenD_1.08_Mac/FutuOpenD.xml');
 const ftOpenDConfig = fs.readFileSync(FutuOpenDXMLPath, { encoding: 'utf8' });
 const userID = ftOpenDConfig.match(/login_account>(\d*?)<\/login_account/)[1];
 const pwdMd5 = ftOpenDConfig.match(/trade_pwd_md5>(.*?)<\/trade_pwd_md5/)[1];
@@ -66,7 +66,7 @@ describe('FtQuant', () => {
   });
 
   it('trdGetMaxTrdQtys', async () => {
-    const res = await ft.trdGetMaxTrdQtys({ code: '00700' });
+    const res = await ft.trdGetMaxTrdQtys({ code: '00700', price: 100000 });
     (typeof res.maxCashBuy !== 'undefined').should.be.true();
   });
 
