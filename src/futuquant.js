@@ -723,7 +723,7 @@ class FutuQuant {
       execArray.shift();
     }
     if (execArray.length > times) {
-      await this.sleep(interval - (now - execArray[0]));
+      await sleep(interval - (now - execArray[0]));
     }
     execArray.push(Date.now());
     this[name] = execArray;
