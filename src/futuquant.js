@@ -2,9 +2,10 @@ const bunyan = require('bunyan');
 const bunyanDebugStream = require('bunyan-debug-stream');
 const Socket = require('./socket');
 
-const sleep = async time => new Promise((resolve) => {
-  setTimeout(resolve, time);
-});
+const sleep = async time =>
+  new Promise(resolve => {
+    setTimeout(resolve, time);
+  });
 
 /**
  * 封装FutuQuant底层协议模块
@@ -25,14 +26,7 @@ class FutuQuant {
   constructor(params, logger) {
     if (typeof params !== 'object') throw new Error('传入参数类型错误');
     // 处理参数
-    const {
-      ip,
-      port,
-      userID,
-      market,
-      pwdMd5,
-      env,
-    } = params;
+    const { ip, port, userID, market, pwdMd5, env } = params;
     if (!ip) throw new Error('必须指定FutuOpenD服务的ip');
     if (!port) throw new Error('必须指定FutuOpenD服务的port');
     if (!userID) throw new Error('必须指定FutuOpenD服务的牛牛号');
@@ -49,19 +43,23 @@ class FutuQuant {
     // 处理日志
     const methods = ['debug', 'info', 'warn', 'error', 'fatal', 'trace'];
     if (this.logger) {
-      methods.forEach((key) => {
+      methods.forEach(key => {
         if (typeof this.logger[key] !== 'function') this.logger = null;
       });
     }
-    this.logger = this.logger || bunyan.createLogger({
-      name: 'sys',
-      streams: [{
-        level: 'debug',
-        type: 'raw',
-        serializers: bunyanDebugStream.serializers,
-        stream: bunyanDebugStream({ forceColor: true }),
-      }],
-    });
+    this.logger =
+      this.logger ||
+      bunyan.createLogger({
+        name: 'sys',
+        streams: [
+          {
+            level: 'debug',
+            type: 'raw',
+            serializers: bunyanDebugStream.serializers,
+            stream: bunyanDebugStream({ forceColor: true }),
+          },
+        ],
+      });
 
     this.socket = new Socket(ip, port, this.logger); // 实例化的socket对象,所有行情拉取接口
     this.inited = false; // 是否已经初始化
@@ -106,13 +104,19 @@ class FutuQuant {
    */
   async initConnect(params) {
     if (this.inited) throw new Error('请勿重复初始化连接');
-    return new Promise(async (resolve) => {
+    return new Promise(async resolve => {
       this.socket.onConnect(async () => {
-        const res = await this.socket.send('InitConnect', Object.assign({
-          clientVer: 101,
-          clientID: 'yisbug',
-          recvNotify: true,
-        }, params));
+        const res = await this.socket.send(
+          'InitConnect',
+          Object.assign(
+            {
+              clientVer: 101,
+              clientID: 'yisbug',
+              recvNotify: true,
+            },
+            params
+          )
+        );
         // 保持心跳
         this.connID = res.connID;
         this.connAESKey = res.connAESKey;
@@ -189,14 +193,20 @@ class FutuQuant {
    * @async
    */
   qotSub(params) {
-    return this.socket.send('Qot_Sub', Object.assign({
-      securityList: [],
-      subTypeList: [],
-      isSubOrUnSub: true,
-      isRegOrUnRegPush: true,
-      regPushRehabTypeList: [],
-      isFirstPush: true,
-    }, params));
+    return this.socket.send(
+      'Qot_Sub',
+      Object.assign(
+        {
+          securityList: [],
+          subTypeList: [],
+          isSubOrUnSub: true,
+          isRegOrUnRegPush: true,
+          regPushRehabTypeList: [],
+          isFirstPush: true,
+        },
+        params
+      )
+    );
   }
   /**
    * Qot_RegQotPush.proto - 3002注册行情推送
@@ -213,14 +223,21 @@ class FutuQuant {
    * @param {boolean} [params.isFirstPush=true] 注册后如果本地已有数据是否首推一次已存在数据,该参数不指定则默认true
    * @async
    */
-  qotRegQotPush(params) { // 3002注册行情推送
-    return this.socket.send('Qot_RegQotPush', Object.assign({
-      securityList: [],
-      subTypeList: [],
-      rehabTypeList: [],
-      isRegOrUnReg: true,
-      isFirstPush: true,
-    }, params));
+  qotRegQotPush(params) {
+    // 3002注册行情推送
+    return this.socket.send(
+      'Qot_RegQotPush',
+      Object.assign(
+        {
+          securityList: [],
+          subTypeList: [],
+          rehabTypeList: [],
+          isRegOrUnReg: true,
+          isFirstPush: true,
+        },
+        params
+      )
+    );
   }
   /**
    * Qot_GetSubInfo.proto协议返回对象
@@ -235,7 +252,8 @@ class FutuQuant {
    * @param {boolean} [isReqAllConn=false] 是否返回所有连接的订阅状态，默认false
    * @returns {QotGetSubInfoResponse}
    */
-  qotGetSubInfo(isReqAllConn = false) { // 3003获取订阅信息
+  qotGetSubInfo(isReqAllConn = false) {
+    // 3003获取订阅信息
     return this.socket.send('Qot_RegQotPush', {
       isReqAllConn,
     });
@@ -249,10 +267,13 @@ class FutuQuant {
    * @returns {BasicQot[]} basicQotList 股票基本报价
    * @async
    */
-  async qotGetBasicQot(securityList) { // 3004获取股票基本行情
-    return (await this.socket.send('Qot_GetBasicQot', {
-      securityList,
-    })).basicQotList || [];
+  async qotGetBasicQot(securityList) {
+    // 3004获取股票基本行情
+    return (
+      (await this.socket.send('Qot_GetBasicQot', {
+        securityList,
+      })).basicQotList || []
+    );
   }
   /**
    * 注册股票基本报价通知，需要先调用订阅接口
@@ -261,7 +282,8 @@ class FutuQuant {
    * @param {function} callback  回调
    * @returns {BasicQot[]} basicQotList
    */
-  subQotUpdateBasicQot(callback) { // 注册股票基本报价通知
+  subQotUpdateBasicQot(callback) {
+    // 注册股票基本报价通知
     return this.socket.subNotify(3005, data => callback(data.basicQotList || []));
   }
   /**
@@ -280,13 +302,22 @@ class FutuQuant {
    * @async
    * @returns {KLine[]} k线点
    */
-  async qotGetKL(params) { // 3006获取K线
-    return (await this.socket.send('Qot_GetKL', Object.assign({
-      rehabType: 1, // Qot_Common.RehabType,复权类型
-      klType: 1, // Qot_Common.KLType,K线类型
-      security: {}, // 股票
-      reqNum: 60, // 请求K线根数
-    }, params))).klList || [];
+  async qotGetKL(params) {
+    // 3006获取K线
+    return (
+      (await this.socket.send(
+        'Qot_GetKL',
+        Object.assign(
+          {
+            rehabType: 1, // Qot_Common.RehabType,复权类型
+            klType: 1, // Qot_Common.KLType,K线类型
+            security: {}, // 股票
+            reqNum: 60, // 请求K线根数
+          },
+          params
+        )
+      )).klList || []
+    );
   }
   /**
    * Qot_UpdateKL.proto协议返回对象
@@ -302,7 +333,8 @@ class FutuQuant {
    * @async
    * @returns {QotUpdateKLResponse} 推送的k线点
    */
-  subQotUpdateKL(callback) { // 注册K线推送
+  subQotUpdateKL(callback) {
+    // 注册K线推送
     return this.socket.subNotify(3007, callback);
   }
   /**
@@ -311,10 +343,13 @@ class FutuQuant {
    * @param {Security} security 股票
    * @returns {TimeShare[]} 分时点
    */
-  async qotGetRT(security) { // 获取分时
-    return (await this.socket.send('Qot_GetRT', {
-      security,
-    })).rtList || [];
+  async qotGetRT(security) {
+    // 获取分时
+    return (
+      (await this.socket.send('Qot_GetRT', {
+        security,
+      })).rtList || []
+    );
   }
   /**
    * 注册分时推送，需要先调用订阅接口
@@ -322,7 +357,8 @@ class FutuQuant {
    * @async
    * @returns {TimeShare[]} 分时点
    */
-  subQotUpdateRT(callback) { // 注册分时推送
+  subQotUpdateRT(callback) {
+    // 注册分时推送
     return this.socket.subNotify(3009, data => callback(data.rtList || []));
   }
   /**
@@ -336,11 +372,14 @@ class FutuQuant {
    * @returns {Ticker[]} 逐笔
    * @async
    */
-  async qotGetTicker(security, maxRetNum = 100) { // 3010获取逐笔
-    return (await this.socket.send('Qot_GetTicker', {
-      security,
-      maxRetNum,
-    })).tickerList || [];
+  async qotGetTicker(security, maxRetNum = 100) {
+    // 3010获取逐笔
+    return (
+      (await this.socket.send('Qot_GetTicker', {
+        security,
+        maxRetNum,
+      })).tickerList || []
+    );
   }
   /**
    * Qot_GetTicker.proto协议返回对象
@@ -355,7 +394,8 @@ class FutuQuant {
    * @param {function} callback  回调
    * @returns {subQotUpdateTickerResponse} 逐笔
    */
-  subQotUpdateTicker(callback) { // 注册逐笔推送
+  subQotUpdateTicker(callback) {
+    // 注册逐笔推送
     return this.socket.subNotify(3011, callback);
   }
   /**
@@ -374,7 +414,8 @@ class FutuQuant {
    * @param {number} num 请求的摆盘个数（1-10），默认10
    * @returns {QotGetOrderBookResponse}
    */
-  async qotGetOrderBook(security, num = 10) { // 3012获取买卖盘
+  async qotGetOrderBook(security, num = 10) {
+    // 3012获取买卖盘
     const result = await this.socket.send('Qot_GetOrderBook', {
       security,
       num,
@@ -383,8 +424,12 @@ class FutuQuant {
     result.orderBookBidList = result.orderBookBidList || [];
     result.sellList = result.orderBookAskList;
     result.buyList = result.orderBookBidList;
-    result.sellList.forEach((item) => { item.volume = Number(item.volume); });
-    result.buyList.forEach((item) => { item.volume = Number(item.volume); });
+    result.sellList.forEach(item => {
+      item.volume = Number(item.volume);
+    });
+    result.buyList.forEach(item => {
+      item.volume = Number(item.volume);
+    });
     return result;
   }
   /**
@@ -394,12 +439,17 @@ class FutuQuant {
    * @param {function} callback 回调
    * @const {QotGetOrderBookResponse}
    */
-  subQotUpdateOrderBook(callback) { // 注册买卖盘推送
-    return this.socket.subNotify(3013, (data) => {
+  subQotUpdateOrderBook(callback) {
+    // 注册买卖盘推送
+    return this.socket.subNotify(3013, data => {
       data.sellList = data.orderBookAskList || [];
       data.buyList = data.orderBookBidList || [];
-      data.sellList.forEach((item) => { item.volume = Number(item.volume); });
-      data.buyList.forEach((item) => { item.volume = Number(item.volume); });
+      data.sellList.forEach(item => {
+        item.volume = Number(item.volume);
+      });
+      data.buyList.forEach(item => {
+        item.volume = Number(item.volume);
+      });
       callback(data);
     });
   }
@@ -418,7 +468,8 @@ class FutuQuant {
    * @param {Security} security Object 股票
    * @returns {QotGetBrokerResponse}
    */
-  async qotGetBroker(security) { // 3014获取经纪队列
+  async qotGetBroker(security) {
+    // 3014获取经纪队列
     const result = await this.socket.send('Qot_GetBroker', {
       security,
     });
@@ -435,8 +486,9 @@ class FutuQuant {
    * @param {function} callback 回调
    * @returns {QotGetBrokerResponse}
    */
-  subQotUpdateBroker(callback) { // 注册经纪队列推送
-    return this.socket.subNotify(3015, (result) => {
+  subQotUpdateBroker(callback) {
+    // 注册经纪队列推送
+    return this.socket.subNotify(3015, result => {
       result.brokerAskList = result.brokerAskList || [];
       result.brokerBidList = result.brokerBidList || [];
       result.sellList = result.brokerAskList;
@@ -457,16 +509,25 @@ class FutuQuant {
    * @param {number} [params.needKLFieldsFlag] 指定返回K线结构体特定某几项数据，KLFields枚举值或组合，如果未指定返回全部字段
    * @returns {KLine[]}
    */
-  async qotGetHistoryKL(params) { // 3100获取单只股票一段历史K线
-    return (await this.socket.send('Qot_GetHistoryKL', Object.assign({
-      rehabType: 1, // Qot_Common.RehabType,复权类型
-      klType: 1, // Qot_Common.KLType,K线类型
-      security: {}, // 股票市场以及股票代码
-      beginTime: '', // 开始时间字符串
-      endTime: '', // 结束时间字符串
-      // maxAckKLNum: 60, // 最多返回多少根K线，如果未指定表示不限制
-      // needKLFieldsFlag: 512, // 指定返回K线结构体特定某几项数据，KLFields枚举值或组合，如果未指定返回全部字段
-    }, params))).klList || [];
+  async qotGetHistoryKL(params) {
+    // 3100获取单只股票一段历史K线
+    return (
+      (await this.socket.send(
+        'Qot_GetHistoryKL',
+        Object.assign(
+          {
+            rehabType: 1, // Qot_Common.RehabType,复权类型
+            klType: 1, // Qot_Common.KLType,K线类型
+            security: {}, // 股票市场以及股票代码
+            beginTime: '', // 开始时间字符串
+            endTime: '', // 结束时间字符串
+            // maxAckKLNum: 60, // 最多返回多少根K线，如果未指定表示不限制
+            // needKLFieldsFlag: 512, // 指定返回K线结构体特定某几项数据，KLFields枚举值或组合，如果未指定返回全部字段
+          },
+          params
+        )
+      )).klList || []
+    );
   }
   /**
    * 当请求时间点数据为空时，如何返回数据
@@ -520,16 +581,25 @@ class FutuQuant {
    * @param {KLFields} [params.needKLFieldsFlag] 指定返回K线结构体特定某几项数据，KLFields枚举值或组合，如果未指定返回全部字段
    * @returns {SecurityHistoryKLPoints[]}
    */
-  qotGetHistoryKLPoints(params) { // 3101获取多只股票多点历史K线
-    return this.socket.send('Qot_GetHistoryKLPoints', Object.assign({
-      rehabType: 1, // Qot_Common.RehabType,复权类型
-      klType: 1, // Qot_Common.KLType,K线类型
-      noDataMode: 0, // NoDataMode,当请求时间点数据为空时，如何返回数据。0
-      securityList: [], // 股票市场以及股票代码
-      timeList: [], // 时间字符串
-      maxReqSecurityNum: 60, // 最多返回多少只股票的数据，如果未指定表示不限制
-      needKLFieldsFlag: 512, // 指定返回K线结构体特定某几项数据，KLFields枚举值或组合，如果未指定返回全部字段
-    }, params)).klPointList || [];
+  qotGetHistoryKLPoints(params) {
+    // 3101获取多只股票多点历史K线
+    return (
+      this.socket.send(
+        'Qot_GetHistoryKLPoints',
+        Object.assign(
+          {
+            rehabType: 1, // Qot_Common.RehabType,复权类型
+            klType: 1, // Qot_Common.KLType,K线类型
+            noDataMode: 0, // NoDataMode,当请求时间点数据为空时，如何返回数据。0
+            securityList: [], // 股票市场以及股票代码
+            timeList: [], // 时间字符串
+            maxReqSecurityNum: 60, // 最多返回多少只股票的数据，如果未指定表示不限制
+            needKLFieldsFlag: 512, // 指定返回K线结构体特定某几项数据，KLFields枚举值或组合，如果未指定返回全部字段
+          },
+          params
+        )
+      ).klPointList || []
+    );
   }
   /**
    * 公司行动组合,指定某些字段值是否有效
@@ -585,7 +655,8 @@ class FutuQuant {
    * @param {Security[]} securityList 股票列表
    * @returns {SecurityRehab[]} securityRehabList 多支股票的复权信息
    */
-  qotGetRehab(securityList) { // 3102获取复权信息
+  qotGetRehab(securityList) {
+    // 3102获取复权信息
     return this.socket.send('Qot_GetRehab', {
       securityList,
     });
@@ -604,12 +675,15 @@ class FutuQuant {
    * @param {string} endTime 结束时间字符串 2018-02-01 00:00:00
    * @return {TradeDate[]} tradeDateList 交易日
    */
-  async qotGetTradeDate(market = 1, beginTime, endTime) { // 3200获取市场交易日
-    return (await this.socket.send('Qot_GetTradeDate', {
-      market,
-      beginTime,
-      endTime,
-    })).tradeDateList || [];
+  async qotGetTradeDate(market = 1, beginTime, endTime) {
+    // 3200获取市场交易日
+    return (
+      (await this.socket.send('Qot_GetTradeDate', {
+        market,
+        beginTime,
+        endTime,
+      })).tradeDateList || []
+    );
   }
   /**
    * Qot_GetStaticInfo.proto - 3202获取股票静态信息
@@ -618,11 +692,14 @@ class FutuQuant {
    * @param {SecurityType} secType Qot_Common.SecurityType,股票类型
    * @returns {SecurityStaticInfo[]} 静态信息数组
    */
-  async qotGetStaticInfo(market = 1, secType) { // 3202获取股票静态信息
-    return (await this.socket.send('Qot_GetStaticInfo', {
-      market,
-      secType,
-    })).staticInfoList || [];
+  async qotGetStaticInfo(market = 1, secType) {
+    // 3202获取股票静态信息
+    return (
+      (await this.socket.send('Qot_GetStaticInfo', {
+        market,
+        secType,
+      })).staticInfoList || []
+    );
   }
   /**
    * 正股类型额外数据
@@ -692,19 +769,17 @@ class FutuQuant {
    * @param {Security[]} securityList 股票列表
    * @returns {Snapshot[]} snapshotList 股票快照
    */
-  async qotGetSecuritySnapShot(securityList) { // 3203获取股票快照
+  async qotGetSecuritySnapShot(securityList) {
+    // 3203获取股票快照
     const list = [].concat(securityList);
     let snapshotList = [];
     while (list.length) {
-      const res = await this.limitExecTimes(
-        30 * 1000, 10,
-        async () => {
-          const data = await this.socket.send('Qot_GetSecuritySnapshot', {
-            securityList: list.splice(-200),
-          });
-          return data.snapshotList;
-        },
-      );
+      const res = await this.limitExecTimes(30 * 1000, 10, async () => {
+        const data = await this.socket.send('Qot_GetSecuritySnapshot', {
+          securityList: list.splice(-200),
+        });
+        return data.snapshotList;
+      });
       snapshotList = snapshotList.concat(res);
     }
     return snapshotList;
@@ -742,11 +817,14 @@ class FutuQuant {
    * @param {PlateSetType} plateSetType Qot_Common.PlateSetType,板块集合的类型
    * @returns {PlateInfo[]}  板块集合下的板块信息
    */
-  async qotGetPlateSet(market = 1, plateSetType) { // 3204获取板块集合下的板块
-    return (await this.socket.send('Qot_GetPlateSet', {
-      market,
-      plateSetType,
-    })).plateInfoList || [];
+  async qotGetPlateSet(market = 1, plateSetType) {
+    // 3204获取板块集合下的板块
+    return (
+      (await this.socket.send('Qot_GetPlateSet', {
+        market,
+        plateSetType,
+      })).plateInfoList || []
+    );
   }
   /**
    * Qot_GetPlateSecurity.proto - 3205获取板块下的股票
@@ -754,10 +832,13 @@ class FutuQuant {
    * @param {Security} plate 板块
    * @returns {SecurityStaticInfo[]}  板块下的股票静态信息
    */
-  async qotGetPlateSecurity(plate) { // 3205获取板块下的股票
-    return (await this.socket.send('Qot_GetPlateSecurity', {
-      plate,
-    })).staticInfoList || [];
+  async qotGetPlateSecurity(plate) {
+    // 3205获取板块下的股票
+    return (
+      (await this.socket.send('Qot_GetPlateSecurity', {
+        plate,
+      })).staticInfoList || []
+    );
   }
   /**
   * 股票类型
@@ -773,23 +854,26 @@ class FutuQuant {
    * @param {ReferenceType} [referenceType] 相关类型，默认为1，获取正股相关的涡轮
    */
   async qotGetReference(security, referenceType = 1) {
-    return (await this.socket.send('Qot_GetReference', {
-      security,
-      referenceType,
-    })).staticInfoList || [];
+    return (
+      (await this.socket.send('Qot_GetReference', {
+        security,
+        referenceType,
+      })).staticInfoList || []
+    );
   }
   /**
    * Trd_GetAccList.proto - 2001获取交易账户列表
    * @async
    * @returns {TrdAcc[]} 交易业务账户列表
    */
-  async trdGetAccList() { // 2001获取交易账户列表
-    const {
-      accList,
-    } = (await this.socket.send('Trd_GetAccList', {
+  async trdGetAccList() {
+    // 2001获取交易账户列表
+    const { accList } = await this.socket.send('Trd_GetAccList', {
       userID: this.userID,
-    }));
-    return accList.filter(acc => acc.trdMarketAuthList.includes(this.market) && acc.trdEnv === this.env);
+    });
+    return accList.filter(
+      acc => acc.trdMarketAuthList.includes(this.market) && acc.trdEnv === this.env
+    );
   }
   /**
    * Trd_UnlockTrade.proto - 2005解锁或锁定交易
@@ -803,7 +887,8 @@ class FutuQuant {
    * @param {string} [pwdMD5] 交易密码的MD5转16进制(全小写)，解锁交易必须要填密码，锁定交易不需要验证密码，可不填
    * @async
    */
-  trdUnlockTrade(unlock = true, pwdMD5 = '') { // 2005解锁或锁定交易
+  trdUnlockTrade(unlock = true, pwdMD5 = '') {
+    // 2005解锁或锁定交易
     if (pwdMD5) this.pwdMD5 = pwdMD5;
     return this.socket.send('Trd_UnlockTrade', {
       unlock,
@@ -815,7 +900,8 @@ class FutuQuant {
    * @async
    * @param {number[]} accIDList 要接收推送数据的业务账号列表，全量非增量，即使用者请每次传需要接收推送数据的所有业务账号
    */
-  async trdSubAccPush(accIDList) { // 2008订阅接收交易账户的推送数据
+  async trdSubAccPush(accIDList) {
+    // 2008订阅接收交易账户的推送数据
     return this.socket.send('Trd_SubAccPush', {
       accIDList,
     });
@@ -826,7 +912,8 @@ class FutuQuant {
    * @param {number} accID 业务账号, 业务账号与交易环境、市场权限需要匹配，否则会返回错误，默认为当前userID
    * @param {TrdMarket} [trdMarket=1] 交易市场, 参见TrdMarket的枚举定义，默认为1，即香港市场。
    */
-  setCommonTradeHeader(trdEnv = 1, accID, trdMarket = 1) { // 设置交易模块的公共header，调用交易相关接口前必须先调用此接口。
+  setCommonTradeHeader(trdEnv = 1, accID, trdMarket = 1) {
+    // 设置交易模块的公共header，调用交易相关接口前必须先调用此接口。
     this.market = trdMarket;
     this.trdHeader = {
       trdEnv,
@@ -838,7 +925,8 @@ class FutuQuant {
    * Trd_GetFunds.proto - 2101获取账户资金，需要先设置交易模块公共header
    * @returns {Funds}
    */
-  async trdGetFunds() { // 2101获取账户资金
+  async trdGetFunds() {
+    // 2101获取账户资金
     if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
     return (await this.socket.send('Trd_GetFunds', {
       header: this.trdHeader,
@@ -852,14 +940,17 @@ class FutuQuant {
    * @param {number} filterPLRatioMax 过滤盈亏比例上限，低于此比例的会返回，如0.2，返回盈亏比例小于20%的持仓
    * @returns {Position[]} 持仓列表数组
    */
-  async trdGetPositionList(filterConditions, filterPLRatioMin, filterPLRatioMax) { // 2102获取持仓列表
+  async trdGetPositionList(filterConditions, filterPLRatioMin, filterPLRatioMax) {
+    // 2102获取持仓列表
     if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
-    return (await this.socket.send('Trd_GetPositionList', {
-      header: this.trdHeader, // 交易公共参数头
-      filterConditions, // 过滤条件
-      filterPLRatioMin, // 过滤盈亏比例下限，高于此比例的会返回，如0.1，返回盈亏比例大于10%的持仓
-      filterPLRatioMax, // 过滤盈亏比例上限，低于此比例的会返回，如0.2，返回盈亏比例小于20%的持仓
-    })).positionList || [];
+    return (
+      (await this.socket.send('Trd_GetPositionList', {
+        header: this.trdHeader, // 交易公共参数头
+        filterConditions, // 过滤条件
+        filterPLRatioMin, // 过滤盈亏比例下限，高于此比例的会返回，如0.1，返回盈亏比例大于10%的持仓
+        filterPLRatioMax, // 过滤盈亏比例上限，低于此比例的会返回，如0.2，返回盈亏比例小于20%的持仓
+      })).positionList || []
+    );
   }
   /**
    * Trd_GetMaxTrdQtys.proto - 2111获取最大交易数量
@@ -876,16 +967,22 @@ class FutuQuant {
    */
   async trdGetMaxTrdQtys(params) {
     if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
-    return (await this.socket.send('Trd_GetMaxTrdQtys', Object.assign({
-      header: this.trdHeader, // 交易公共参数头
-      orderType: 1, // 订单类型, 参见Trd_Common.OrderType的枚举定义
-      code: '', // 代码
-      price: 0, // 价格，3位精度(A股2位)
-      // orderID: 0, // 订单号，新下订单不需要，如果是修改订单就需要把原订单号带上才行，因为改单的最大买卖数量会包含原订单数量。
-      // 以下为调整价格使用，目前仅对港、A股有效，因为港股有价位，A股2位精度，美股不需要
-      adjustPrice: false, // 是否调整价格，如果价格不合法，是否调整到合法价位，true调整，false不调整
-      adjustSideAndLimit: 0, // 调整方向和调整幅度百分比限制，正数代表向上调整，负数代表向下调整，具体值代表调整幅度限制，如：0.015代表向上调整且幅度不超过1.5%；-0.01代表向下调整且幅度不超过1%
-    }, params))).maxTrdQtys;
+    return (await this.socket.send(
+      'Trd_GetMaxTrdQtys',
+      Object.assign(
+        {
+          header: this.trdHeader, // 交易公共参数头
+          orderType: 1, // 订单类型, 参见Trd_Common.OrderType的枚举定义
+          code: '', // 代码
+          price: 0, // 价格，3位精度(A股2位)
+          // orderID: 0, // 订单号，新下订单不需要，如果是修改订单就需要把原订单号带上才行，因为改单的最大买卖数量会包含原订单数量。
+          // 以下为调整价格使用，目前仅对港、A股有效，因为港股有价位，A股2位精度，美股不需要
+          adjustPrice: false, // 是否调整价格，如果价格不合法，是否调整到合法价位，true调整，false不调整
+          adjustSideAndLimit: 0, // 调整方向和调整幅度百分比限制，正数代表向上调整，负数代表向下调整，具体值代表调整幅度限制，如：0.015代表向上调整且幅度不超过1.5%；-0.01代表向下调整且幅度不超过1%
+        },
+        params
+      )
+    )).maxTrdQtys;
   }
   /**
    * Trd_GetOrderList.proto - 2201获取订单列表
@@ -894,13 +991,16 @@ class FutuQuant {
    * @param {OrderStatus[]} filterStatusList 需要过滤的订单状态列表
    * @returns {Order[]} 订单列表
    */
-  async trdGetOrderList(filterConditions, filterStatusList) { // 2201获取订单列表
+  async trdGetOrderList(filterConditions, filterStatusList) {
+    // 2201获取订单列表
     if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
-    return (await this.socket.send('Trd_GetOrderList', {
-      header: this.trdHeader, // 交易公共参数头
-      filterConditions,
-      filterStatusList,
-    })).orderList || [];
+    return (
+      (await this.socket.send('Trd_GetOrderList', {
+        header: this.trdHeader, // 交易公共参数头
+        filterConditions,
+        filterStatusList,
+      })).orderList || []
+    );
   }
   /**
    * Trd_PlaceOrder.proto - 2202下单
@@ -924,23 +1024,30 @@ class FutuQuant {
    * @param {number} [params.adjustSideAndLimit] 调整方向和调整幅度百分比限制，正数代表向上调整，负数代表向下调整，具体值代表调整幅度限制，如：0.015代表向上调整且幅度不超过1.5%；-0.01代表向下调整且幅度不超过1%
    * @returns {number} orderID 订单号
    */
-  async trdPlaceOrder(params) { // 2202下单
+  async trdPlaceOrder(params) {
+    // 2202下单
     if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
-    return (await this.socket.send('Trd_PlaceOrder', Object.assign({
-      packetID: {
-        connID: this.connID,
-        serialNo: this.socket.requestId,
-      }, // 交易写操作防重放攻击
-      header: this.trdHeader, // 交易公共参数头
-      trdSide: 0, // 交易方向，1买入，2卖出
-      orderType: 1, // 订单类型, 参见Trd_Common.OrderType的枚举定义
-      code: '', // 代码
-      qty: 0, // 数量，2位精度，期权单位是"张"
-      price: 0, // 价格，3位精度(A股2位)
-      // 以下为调整价格使用，目前仅对港、A股有效，因为港股有价位，A股2位精度，美股不需要
-      adjustPrice: false, // 是否调整价格，如果价格不合法，是否调整到合法价位，true调整，false不调整
-      adjustSideAndLimit: 0, // 调整方向和调整幅度百分比限制，正数代表向上调整，负数代表向下调整，具体值代表调整幅度限制，如：0.015代表向上调整且幅度不超过1.5%；-0.01代表向下调整且幅度不超过1%
-    }, params))).orderID;
+    return (await this.socket.send(
+      'Trd_PlaceOrder',
+      Object.assign(
+        {
+          packetID: {
+            connID: this.connID,
+            serialNo: this.socket.requestId,
+          }, // 交易写操作防重放攻击
+          header: this.trdHeader, // 交易公共参数头
+          trdSide: 0, // 交易方向，1买入，2卖出
+          orderType: 1, // 订单类型, 参见Trd_Common.OrderType的枚举定义
+          code: '', // 代码
+          qty: 0, // 数量，2位精度，期权单位是"张"
+          price: 0, // 价格，3位精度(A股2位)
+          // 以下为调整价格使用，目前仅对港、A股有效，因为港股有价位，A股2位精度，美股不需要
+          adjustPrice: false, // 是否调整价格，如果价格不合法，是否调整到合法价位，true调整，false不调整
+          adjustSideAndLimit: 0, // 调整方向和调整幅度百分比限制，正数代表向上调整，负数代表向下调整，具体值代表调整幅度限制，如：0.015代表向上调整且幅度不超过1.5%；-0.01代表向下调整且幅度不超过1%
+        },
+        params
+      )
+    )).orderID;
   }
   /**
    * 2202市价下单，直到成功为止，返回买入/卖出的总价格
@@ -952,22 +1059,30 @@ class FutuQuant {
    * @param {number} params.qty 数量，2位精度，期权单位是"张"
    * @returns {number} 卖出/买入总价
    */
-  async trdPlaceOrderMarket(param) { // 市价买入卖出
+  async trdPlaceOrderMarket(param) {
+    // 市价买入卖出
     const { trdSide, code, qty } = param; // trdSide 1买入2卖出
     let remainQty = qty;
     let value = 0;
     while (remainQty > 0) {
       let orderID = null;
       let order = null;
-      const orderBooks = await this.qotGetOrderBook({ market: this.market, code });// 获取盘口
+      const orderBooks = await this.qotGetOrderBook({ market: this.market, code }); // 获取盘口
       const price = trdSide === 1 ? orderBooks.sellList[0].price : orderBooks.buyList[0].price;
       if (orderID && order.orderStatus === 10) {
-        await this.trdModifyOrder({// 修改订单并设置订单为有效
-          modifyOrderOp: 4, orderID, price, qty: remainQty,
+        await this.trdModifyOrder({
+          // 修改订单并设置订单为有效
+          modifyOrderOp: 4,
+          orderID,
+          price,
+          qty: remainQty,
         });
       } else if (!orderID) {
         orderID = await this.trdPlaceOrder({
-          trdSide, code, qty: remainQty, price,
+          trdSide,
+          code,
+          qty: remainQty,
+          price,
         }); // 下单
       }
       // eslint-disable-next-line
@@ -986,7 +1101,8 @@ class FutuQuant {
           } else if (order.fillQty > 0) {
             remainQty -= order.fillQty;
             value += order.price * order.fillQty;
-            if (remainQty > 0 && order.orderStatus === 10) { // 部分成交，先设置为失效
+            if (remainQty > 0 && order.orderStatus === 10) {
+              // 部分成交，先设置为失效
               await this.trdModifyOrder({ modifyOrderOp: 3, orderID }); // 失效
             }
           }
@@ -1019,23 +1135,30 @@ class FutuQuant {
    * @param {number} [params.adjustSideAndLimit] 调整方向和调整幅度百分比限制，正数代表向上调整，负数代表向下调整，具体值代表调整幅度限制，如：0.015代表向上调整且幅度不超过1.5%；-0.01代表向下调整且幅度不超过1%
    * @returns {number} orderID 订单号
    */
-  async trdModifyOrder(params) { // 2205修改订单(改价、改量、改状态等)
+  async trdModifyOrder(params) {
+    // 2205修改订单(改价、改量、改状态等)
     if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
-    return (await this.socket.send('Trd_ModifyOrder', Object.assign({
-      packetID: {
-        connID: this.connID,
-        serialNo: this.socket.requestId,
-      }, // 交易写操作防重放攻击
-      header: this.trdHeader, // 交易公共参数头
-      orderID: 0, // 订单号，forAll为true时，传0
-      modifyOrderOp: 1, // //修改操作类型，参见Trd_Common.ModifyOrderOp的枚举定义
-      forAll: false, // /是否对此业务账户的全部订单操作，true是，false否(对单个订单)，无此字段代表false，仅对单个订单
-      qty: 0, // 数量，2位精度，期权单位是"张"
-      price: 0, // 价格，3位精度(A股2位)
-      // 以下为调整价格使用，目前仅对港、A股有效，因为港股有价位，A股2位精度，美股不需要
-      adjustPrice: false, // 是否调整价格，如果价格不合法，是否调整到合法价位，true调整，false不调整
-      adjustSideAndLimit: 0, // 调整方向和调整幅度百分比限制，正数代表向上调整，负数代表向下调整，具体值代表调整幅度限制，如：0.015代表向上调整且幅度不超过1.5%；-0.01代表向下调整且幅度不超过1%
-    }, params))).orderID;
+    return (await this.socket.send(
+      'Trd_ModifyOrder',
+      Object.assign(
+        {
+          packetID: {
+            connID: this.connID,
+            serialNo: this.socket.requestId,
+          }, // 交易写操作防重放攻击
+          header: this.trdHeader, // 交易公共参数头
+          orderID: 0, // 订单号，forAll为true时，传0
+          modifyOrderOp: 1, // //修改操作类型，参见Trd_Common.ModifyOrderOp的枚举定义
+          forAll: false, // /是否对此业务账户的全部订单操作，true是，false否(对单个订单)，无此字段代表false，仅对单个订单
+          qty: 0, // 数量，2位精度，期权单位是"张"
+          price: 0, // 价格，3位精度(A股2位)
+          // 以下为调整价格使用，目前仅对港、A股有效，因为港股有价位，A股2位精度，美股不需要
+          adjustPrice: false, // 是否调整价格，如果价格不合法，是否调整到合法价位，true调整，false不调整
+          adjustSideAndLimit: 0, // 调整方向和调整幅度百分比限制，正数代表向上调整，负数代表向下调整，具体值代表调整幅度限制，如：0.015代表向上调整且幅度不超过1.5%；-0.01代表向下调整且幅度不超过1%
+        },
+        params
+      )
+    )).orderID;
   }
   /**
    * 注册订单更新通知
@@ -1044,15 +1167,17 @@ class FutuQuant {
    * @param {function} callback 回调
    * @returns {Order} 订单结构
    */
-  async subTrdUpdateOrder(callback) { // 注册订单更新通知
+  async subTrdUpdateOrder(callback) {
+    // 注册订单更新通知
     return this.socket.subNotify(2208, data => callback(data.order));
   }
   /**
-  * 取消注册订单更新通知
-  * Trd_UpdateOrder.proto - 2208推送订单更新
-  * @async
-  */
-  async unsubTrdUpdateOrder() { // 取消注册订单更新通知
+   * 取消注册订单更新通知
+   * Trd_UpdateOrder.proto - 2208推送订单更新
+   * @async
+   */
+  async unsubTrdUpdateOrder() {
+    // 取消注册订单更新通知
     return this.socket.unsubNotify(2208);
   }
   /**
@@ -1061,12 +1186,15 @@ class FutuQuant {
    * @param {TrdFilterConditions} filterConditions 过滤条件
    * @returns {OrderFill[]} 成交列表
    */
-  async trdGetOrderFillList(filterConditions) { // 2211获取成交列表
+  async trdGetOrderFillList(filterConditions) {
+    // 2211获取成交列表
     if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
-    return (await this.socket.send('Trd_GetOrderFillList', {
-      header: this.trdHeader, // 交易公共参数头
-      filterConditions,
-    })).orderFillList || [];
+    return (
+      (await this.socket.send('Trd_GetOrderFillList', {
+        header: this.trdHeader, // 交易公共参数头
+        filterConditions,
+      })).orderFillList || []
+    );
   }
   /**
    * 注册新成交通知
@@ -1074,7 +1202,8 @@ class FutuQuant {
    * @param {function} callback 回调
    * @returns {OrderFill} 成交结构
    */
-  async subTrdUpdateOrderFill(callback) { // 注册新成交通知
+  async subTrdUpdateOrderFill(callback) {
+    // 注册新成交通知
     return this.socket.subNotify(2218, data => callback(data.orderFill || []));
   }
   /**
@@ -1090,13 +1219,16 @@ class FutuQuant {
    * @param {OrderStatus} filterStatusList OrderStatus, 需要过滤的订单状态列表
    * @returns {Order[]} 历史订单列表
    */
-  async trdGetHistoryOrderList(filterConditions, filterStatusList) { // 2221获取历史订单列表
+  async trdGetHistoryOrderList(filterConditions, filterStatusList) {
+    // 2221获取历史订单列表
     if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
-    return (await this.socket.send('Trd_GetHistoryOrderList', {
-      header: this.trdHeader, // 交易公共参数头
-      filterConditions,
-      filterStatusList,
-    })).orderList || [];
+    return (
+      (await this.socket.send('Trd_GetHistoryOrderList', {
+        header: this.trdHeader, // 交易公共参数头
+        filterConditions,
+        filterStatusList,
+      })).orderList || []
+    );
   }
   /**
    * Trd_GetHistoryOrderFillList.proto - 2222获取历史成交列表
@@ -1109,12 +1241,15 @@ class FutuQuant {
    * @param {TrdFilterConditions} filterConditions 过滤条件
    * @returns {OrderFill[]} 历史成交列表
    */
-  async trdGetHistoryOrderFillList(filterConditions) { // 2222获取历史成交列表
+  async trdGetHistoryOrderFillList(filterConditions) {
+    // 2222获取历史成交列表
     if (!this.trdHeader) throw new Error('请先调用setCommonTradeHeader接口设置交易公共header');
-    return (await this.socket.send('Trd_GetHistoryOrderFillList', {
-      header: this.trdHeader, // 交易公共参数头
-      filterConditions,
-    })).orderFillList || [];
+    return (
+      (await this.socket.send('Trd_GetHistoryOrderFillList', {
+        header: this.trdHeader, // 交易公共参数头
+        filterConditions,
+      })).orderFillList || []
+    );
   }
 }
 

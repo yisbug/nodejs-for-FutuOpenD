@@ -4,9 +4,8 @@ const hexSha1 = require('hex-sha1');
 const ProtoId = require('./protoid');
 const Pb = require('./pb.json');
 
-
 const ProtoName = {};
-Object.keys(ProtoId).forEach((key) => {
+Object.keys(ProtoId).forEach(key => {
   ProtoName[ProtoId[key]] = key;
 });
 
@@ -73,12 +72,12 @@ class Socket {
 
     this.socket = new net.Socket();
     this.socket.setKeepAlive(true);
-    this.socket.on('error', (data) => {
+    this.socket.on('error', data => {
       this.logger.error(`${this.name} on error: ${data}`);
       this.socket.destroy();
       this.isConnect = false;
     });
-    this.socket.on('timeout', (e) => {
+    this.socket.on('timeout', e => {
       this.logger.error(`${this.name} on timeout.`, e);
       this.socket.destroy();
       this.isConnect = false;
@@ -96,7 +95,7 @@ class Socket {
       }, 5000);
     });
     // 接收数据
-    this.socket.on('data', (data) => {
+    this.socket.on('data', data => {
       this.recvBuffer = Buffer.concat([this.recvBuffer, data]);
       this.parseData();
     });
@@ -110,21 +109,24 @@ class Socket {
    */
   async connect() {
     this.isHandStop = false;
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (this.timerRecontent) {
         clearTimeout(this.timerRecontent);
         this.timerRecontent = null;
       }
-      this.socket.connect({
-        port: this.port,
-        host: this.ip,
-        timeout: 1000 * 30,
-      }, async () => {
-        this.logger.debug(`${this.name} connect success:${this.ip}:${this.port}`);
-        this.isConnect = true;
-        if (typeof this.connectCallback === 'function') this.connectCallback();
-        resolve();
-      });
+      this.socket.connect(
+        {
+          port: this.port,
+          host: this.ip,
+          timeout: 1000 * 30,
+        },
+        async () => {
+          this.logger.debug(`${this.name} connect success:${this.ip}:${this.port}`);
+          this.isConnect = true;
+          if (typeof this.connectCallback === 'function') this.connectCallback();
+          resolve();
+        }
+      );
     });
   }
   async close() {
@@ -180,11 +182,17 @@ class Socket {
     const response = this.root[protoName].Response;
 
     // 处理请求数据
-    const reqBuffer = request.encode(request.create({
-      c2s: message,
-    })).finish();
+    const reqBuffer = request
+      .encode(
+        request.create({
+          c2s: message,
+        })
+      )
+      .finish();
     const sha1 = hexSha1(reqBuffer);
-    const sha1Buffer = new Uint8Array(20).map((item, index) => Number(`0x${sha1.substr(index * 2, 2)}`));
+    const sha1Buffer = new Uint8Array(20).map((item, index) =>
+      Number(`0x${sha1.substr(index * 2, 2)}`)
+    );
     this.logger.debug(`request:${protoName}(${protoId}),reqId:${requestId}`);
     // 处理包头
     const buffer = Buffer.concat([
@@ -201,7 +209,7 @@ class Socket {
     // 发送请求，处理回调
     this.socket.write(buffer);
     return new Promise((resolve, reject) => {
-      this.cacheResponseCallback[requestId] = (responseBuffer) => {
+      this.cacheResponseCallback[requestId] = responseBuffer => {
         const result = response.decode(responseBuffer).toJSON();
         if (result.retType === 0) return resolve(result.s2c);
         const errMsg = `服务器返回结果失败,request:${protoName}(${protoId}),retType:${result.retType},reqId:${requestId},errMsg:${result.retMsg}`;
@@ -222,15 +230,20 @@ class Socket {
     let bodySha1 = null; // 包体sha1
     // 先处理包头
     if (!this.header && this.recvBuffer.length >= headerLen) {
-      let recvSha1 = new Array(21).join('0').split('').map((item, index) => {
-        let str = this.recvBuffer.readUInt8(16 + index).toString(16);
-        if (str.length === 1) str = `0${str}`;
-        return str;
-      });
+      let recvSha1 = new Array(21)
+        .join('0')
+        .split('')
+        .map((item, index) => {
+          let str = this.recvBuffer.readUInt8(16 + index).toString(16);
+          if (str.length === 1) str = `0${str}`;
+          return str;
+        });
       recvSha1 = recvSha1.join('');
       this.header = {
         // 包头起始标志，固定为“FT”
-        szHeaderFlag: String.fromCharCode(this.recvBuffer.readUInt8(0)) + String.fromCharCode(this.recvBuffer.readUInt8(1)),
+        szHeaderFlag:
+          String.fromCharCode(this.recvBuffer.readUInt8(0)) +
+          String.fromCharCode(this.recvBuffer.readUInt8(1)),
         nProtoID: this.recvBuffer.readUInt32LE(2), // 协议ID
         nProtoFmtType: this.recvBuffer.readUInt8(6), // 协议格式类型，0为Protobuf格式，1为Json格式
         nProtoVer: this.recvBuffer.readUInt8(7), // 协议版本，用于迭代兼容
@@ -240,7 +253,11 @@ class Socket {
         arrReserved: this.recvBuffer.slice(36, 44), // 保留8字节扩展
       };
       if (this.header.szHeaderFlag !== 'FT') throw new Error('接收的包头数据格式错误');
-      this.logger.debug(`response:${ProtoName[this.header.nProtoID]}(${this.header.nProtoID}),reqId:${this.header.nSerialNo},bodyLen:${bodyLen}`);
+      this.logger.debug(
+        `response:${ProtoName[this.header.nProtoID]}(${this.header.nProtoID}),reqId:${
+          this.header.nSerialNo
+        },bodyLen:${bodyLen}`
+      );
     }
 
     // 已经接收指定包体长度的全部数据，切割包体buffer
