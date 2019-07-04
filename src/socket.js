@@ -1,6 +1,6 @@
 const net = require('net');
 const protobufjs = require('protobufjs');
-const hexSha1 = require('hex-sha1');
+const crypto = require('crypto');
 const ProtoId = require('./protoid');
 const Pb = require('./pb.json');
 
@@ -189,7 +189,10 @@ class Socket {
         })
       )
       .finish();
-    const sha1 = hexSha1(reqBuffer);
+    const sha1 = crypto
+      .createHash('sha1')
+      .update(reqBuffer)
+      .digest('hex');
     const sha1Buffer = new Uint8Array(20).map((item, index) =>
       Number(`0x${sha1.substr(index * 2, 2)}`)
     );
@@ -271,7 +274,10 @@ class Socket {
       bodyBuffer = this.recvBuffer.slice(44, bodyLen + headerLen);
       this.recvBuffer = this.recvBuffer.slice(bodyLen + headerLen);
 
-      const sha1 = hexSha1(bodyBuffer);
+      const sha1 = crypto
+        .createHash('sha1')
+        .update(bodyBuffer)
+        .digest('hex');
       if (sha1 !== bodySha1) {
         throw new Error(`接收的包体sha1加密错误：${bodySha1},本地sha1：${sha1}`);
       }

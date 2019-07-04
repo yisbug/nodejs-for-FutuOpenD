@@ -24,10 +24,8 @@
   },
   "homepage": "https://github.com/yisbug/futuquant#readme",
   "dependencies": {
-    "buffer": "^5.2.0",
     "bunyan": "^1.8.12",
     "bunyan-debug-stream": "^1.0.8",
-    "hex-sha1": "^1.0.2",
     "protobufjs": "^6.8.6"
   },
   "devDependencies": {
