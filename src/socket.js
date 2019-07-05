@@ -1,5 +1,4 @@
 const net = require('net');
-const protobufjs = require('protobufjs');
 const crypto = require('crypto');
 const ProtoId = require('./protoid');
 const proto = require('./pb');
