@@ -9,7 +9,7 @@
     "doc": "rm -rf doc && jsdoc -c jsdoc.json -t ./node_modules/ink-docstrap/template",
     "demo-es6": "node --experimental-modules demo.mjs",
     "demo-es5": "node demo.js",
-    "pb": "pbjs -t json src/pb/*.proto > src/pb.json",
+    "pb": "pbjs -t json pb/*.proto > src/pb.json",
     "log": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "pub": "npm run log && npm run doc && npm publish"
   },
