@@ -20,9 +20,8 @@ class Socket {
    * Creates an instance of Socket.
    * @param {string} ip OpenD服务Ip
    * @param {number} port OpenD服务端口
-   * @param {object} logger 日志对象
    */
-  constructor(ip, port, logger) {
+  constructor(ip, port) {
     /**
      * OpenD服务IP
      * @type {string}
@@ -33,11 +32,6 @@ class Socket {
      * @type {number}
      */
     this.port = port;
-    /**
-     * 日志对象
-     * @type {object}
-     */
-    this.logger = logger;
 
     id += 1;
     /**
@@ -73,12 +67,12 @@ class Socket {
     this.socket = new net.Socket();
     this.socket.setKeepAlive(true);
     this.socket.on('error', data => {
-      this.logger.error(`${this.name} on error: ${data}`);
+      console.error(`${this.name} on error: ${data}`);
       this.socket.destroy();
       this.isConnect = false;
     });
     this.socket.on('timeout', e => {
-      this.logger.error(`${this.name} on timeout.`, e);
+      console.error(`${this.name} on timeout.`, e);
       this.socket.destroy();
       this.isConnect = false;
     });
@@ -86,7 +80,7 @@ class Socket {
     this.socket.on('close', () => {
       if (this.isHandStop) return;
       const errMsg = `${this.name} on closed and retry connect on 5 seconds.`;
-      this.logger.error(errMsg);
+      console.error(errMsg);
       this.isConnect = false;
       // 5s后重连
       if (this.timerRecontent) return;
@@ -121,7 +115,7 @@ class Socket {
           timeout: 1000 * 30,
         },
         async () => {
-          this.logger.debug(`${this.name} connect success:${this.ip}:${this.port}`);
+          console.debug(`${this.name} connect success:${this.ip}:${this.port}`);
           this.isConnect = true;
           if (typeof this.connectCallback === 'function') this.connectCallback();
           resolve();
@@ -133,7 +127,7 @@ class Socket {
     this.socket.end();
     this.socket.destroy();
     this.isHandStop = true;
-    this.logger.info('手动关闭 socket 。');
+    console.info('手动关闭 socket 。');
   }
   /**
    * 设置连接成功的回调函数
@@ -170,9 +164,9 @@ class Socket {
    * @param {object} message 要发送的数据
    */
   send(protoName, message) {
-    if (!this.isConnect) return this.logger.warn(`${this.name} 尚未连接，无法发送请求。`);
+    if (!this.isConnect) return console.warn(`${this.name} 尚未连接，无法发送请求。`);
     const protoId = ProtoId[protoName];
-    if (!protoId) return this.logger.warn(`找不到对应的协议Id:${protoName}`);
+    if (!protoId) return console.warn(`找不到对应的协议Id:${protoName}`);
     // 请求序列号，自增
     if (this.requestId > 1000000) this.requestId = 1000;
     const { requestId } = this;
@@ -196,7 +190,7 @@ class Socket {
     const sha1Buffer = new Uint8Array(20).map((item, index) =>
       Number(`0x${sha1.substr(index * 2, 2)}`)
     );
-    this.logger.debug(`request:${protoName}(${protoId}),reqId:${requestId}`);
+    console.debug(`request:${protoName}(${protoId}),reqId:${requestId}`);
     // 处理包头
     const buffer = Buffer.concat([
       Buffer.from('FT'), // 包头起始标志，固定为“FT”
@@ -216,7 +210,7 @@ class Socket {
         const result = response.decode(responseBuffer).toJSON();
         if (result.retType === 0) return resolve(result.s2c);
         const errMsg = `服务器返回结果失败,request:${protoName}(${protoId}),retType:${result.retType},reqId:${requestId},errMsg:${result.retMsg}`;
-        this.logger.error(errMsg);
+        console.error(errMsg);
         return reject(new Error(errMsg));
       };
     });
@@ -256,7 +250,7 @@ class Socket {
         arrReserved: this.recvBuffer.slice(36, 44), // 保留8字节扩展
       };
       if (this.header.szHeaderFlag !== 'FT') throw new Error('接收的包头数据格式错误');
-      this.logger.debug(
+      console.debug(
         `response:${ProtoName[this.header.nProtoID]}(${this.header.nProtoID}),reqId:${
           this.header.nSerialNo
         },bodyLen:${bodyLen}`
@@ -296,7 +290,7 @@ class Socket {
           this.cacheNotifyCallback[protoId](result.s2c);
         } catch (e) {
           const errMsg = `通知回调执行错误，response:${ProtoName[protoId]}(${protoId}),reqId:${reqId},bodyLen:${bodyLen}，堆栈：${e.stack}`;
-          this.logger.error(errMsg);
+          console.error(errMsg);
           throw new Error(errMsg);
         }
       }
