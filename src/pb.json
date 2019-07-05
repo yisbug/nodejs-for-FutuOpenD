@@ -10,6 +10,13 @@
             "RetType_Unknown": -400
           }
         },
+        "PacketEncAlgo": {
+          "values": {
+            "PacketEncAlgo_FTAES_ECB": 0,
+            "PacketEncAlgo_None": -1,
+            "PacketEncAlgo_AES_ECB": 1
+          }
+        },
         "PacketID": {
           "fields": {
             "connID": {
@@ -28,6 +35,35 @@
     },
     "GetGlobalState": {
       "nested": {
+        "ProgramStatusType": {
+          "values": {
+            "ProgramStatusType_None": 0,
+            "ProgramStatusType_Loaded": 1,
+            "ProgramStatusType_Loging": 2,
+            "ProgramStatusType_NeedPicVerifyCode": 3,
+            "ProgramStatusType_NeedPhoneVerifyCode": 4,
+            "ProgramStatusType_LoginFailed": 5,
+            "ProgramStatusType_ForceUpdate": 6,
+            "ProgramStatusType_NessaryDataPreparing": 7,
+            "ProgramStatusType_NessaryDataMissing": 8,
+            "ProgramStatusType_UnAgreeDisclaimer": 9,
+            "ProgramStatusType_Ready": 10,
+            "ProgramStatusType_ForceLogout": 11
+          }
+        },
+        "ProgramStatus": {
+          "fields": {
+            "type": {
+              "rule": "required",
+              "type": "ProgramStatusType",
+              "id": 1
+            },
+            "strExtDesc": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
         "C2S": {
           "fields": {
             "userID": {
@@ -92,6 +128,10 @@
             "localTime": {
               "type": "double",
               "id": 11
+            },
+            "programStatus": {
+              "type": "ProgramStatus",
+              "id": 12
             }
           }
         },
@@ -201,6 +241,13 @@
             "QotMarketState_FutureDayClose": 17,
             "QotMarketState_FutureDayWaitForOpen": 18,
             "QotMarketState_HkCas": 19
+          }
+        },
+        "TradeDateType": {
+          "values": {
+            "TradeDateType_Whole": 0,
+            "TradeDateType_Morning": 1,
+            "TradeDateType_Afternoon": 2
           }
         },
         "RehabType": {
@@ -329,6 +376,111 @@
             "PushDataType_Cache": 3
           }
         },
+        "SortField": {
+          "values": {
+            "SortField_Unknow": 0,
+            "SortField_Code": 1,
+            "SortField_CurPrice": 2,
+            "SortField_PriceChangeVal": 3,
+            "SortField_ChangeRate": 4,
+            "SortField_Status": 5,
+            "SortField_BidPrice": 6,
+            "SortField_AskPrice": 7,
+            "SortField_BidVol": 8,
+            "SortField_AskVol": 9,
+            "SortField_Volume": 10,
+            "SortField_Turnover": 11,
+            "SortField_Score": 12,
+            "SortField_Premium": 13,
+            "SortField_EffectiveLeverage": 14,
+            "SortField_Delta": 15,
+            "SortField_ImpliedVolatility": 16,
+            "SortField_Type": 17,
+            "SortField_StrikePrice": 18,
+            "SortField_BreakEvenPoint": 19,
+            "SortField_MaturityTime": 20,
+            "SortField_ListTime": 21,
+            "SortField_LastTradeTime": 22,
+            "SortField_Leverage": 23,
+            "SortField_InOutMoney": 24,
+            "SortField_RecoveryPrice": 25,
+            "SortField_ChangePrice": 26,
+            "SortField_Change": 27,
+            "SortField_StreetRate": 28,
+            "SortField_StreetVol": 29,
+            "SortField_Amplitude": 30,
+            "SortField_WarrantName": 31,
+            "SortField_Issuer": 32,
+            "SortField_LotSize": 33,
+            "SortField_IssueSize": 34
+          }
+        },
+        "Issuer": {
+          "values": {
+            "Issuer_Unknow": 0,
+            "Issuer_SG": 1,
+            "Issuer_BP": 2,
+            "Issuer_CS": 3,
+            "Issuer_CT": 4,
+            "Issuer_EA": 5,
+            "Issuer_GS": 6,
+            "Issuer_HS": 7,
+            "Issuer_JP": 8,
+            "Issuer_MB": 9,
+            "Issuer_SC": 10,
+            "Issuer_UB": 11,
+            "Issuer_BI": 12,
+            "Issuer_DB": 13,
+            "Issuer_DC": 14,
+            "Issuer_ML": 15,
+            "Issuer_NM": 16,
+            "Issuer_RB": 17,
+            "Issuer_RS": 18,
+            "Issuer_BC": 19,
+            "Issuer_HT": 20,
+            "Issuer_VT": 21,
+            "Issuer_KC": 22
+          }
+        },
+        "IpoPeriod": {
+          "values": {
+            "IpoPeriod_Unknow": 0,
+            "IpoPeriod_Today": 1,
+            "IpoPeriod_Tomorrow": 2,
+            "IpoPeriod_Nextweek": 3,
+            "IpoPeriod_Lastweek": 4,
+            "IpoPeriod_Lastmonth": 5
+          }
+        },
+        "PriceType": {
+          "values": {
+            "PriceType_Unknow": 0,
+            "PriceType_Outside": 1,
+            "PriceType_WithIn": 2
+          }
+        },
+        "WarrantStatus": {
+          "values": {
+            "WarrantStatus_Unknow": 0,
+            "WarrantStatus_Normal": 1,
+            "WarrantStatus_Suspend": 2,
+            "WarrantStatus_StopTrade": 3,
+            "WarrantStatus_PendingListing": 4
+          }
+        },
+        "CompanyAct": {
+          "values": {
+            "CompanyAct_None": 0,
+            "CompanyAct_Split": 1,
+            "CompanyAct_Join": 2,
+            "CompanyAct_Bonus": 4,
+            "CompanyAct_Transfer": 8,
+            "CompanyAct_Allot": 16,
+            "CompanyAct_Add": 32,
+            "CompanyAct_Dividend": 64,
+            "CompanyAct_SPDividend": 128
+          }
+        },
         "Security": {
           "fields": {
             "market": {
@@ -394,6 +546,10 @@
             "changeRate": {
               "type": "double",
               "id": 12
+            },
+            "timestamp": {
+              "type": "double",
+              "id": 13
             }
           }
         },
@@ -527,6 +683,14 @@
               "type": "int32",
               "id": 15
             },
+            "listTimestamp": {
+              "type": "double",
+              "id": 17
+            },
+            "updateTimestamp": {
+              "type": "double",
+              "id": 18
+            },
             "optionExData": {
               "type": "OptionBasicQotExData",
               "id": 16
@@ -569,6 +733,10 @@
             "turnover": {
               "type": "double",
               "id": 8
+            },
+            "timestamp": {
+              "type": "double",
+              "id": 9
             }
           }
         },
@@ -607,6 +775,10 @@
             "delisting": {
               "type": "bool",
               "id": 7
+            },
+            "listTimestamp": {
+              "type": "double",
+              "id": 8
             }
           }
         },
@@ -655,6 +827,10 @@
               "rule": "required",
               "type": "string",
               "id": 6
+            },
+            "strikeTimestamp": {
+              "type": "double",
+              "id": 7
             }
           }
         },
@@ -741,6 +917,10 @@
             "pushDataType": {
               "type": "int32",
               "id": 10
+            },
+            "timestamp": {
+              "type": "double",
+              "id": 11
             }
           }
         },
@@ -811,6 +991,10 @@
               "rule": "required",
               "type": "string",
               "id": 6
+            },
+            "timestamp": {
+              "type": "double",
+              "id": 7
             }
           }
         },
@@ -864,6 +1048,206 @@
               "id": 3
             }
           }
+        },
+        "Rehab": {
+          "fields": {
+            "time": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "companyActFlag": {
+              "rule": "required",
+              "type": "int64",
+              "id": 2
+            },
+            "fwdFactorA": {
+              "rule": "required",
+              "type": "double",
+              "id": 3
+            },
+            "fwdFactorB": {
+              "rule": "required",
+              "type": "double",
+              "id": 4
+            },
+            "bwdFactorA": {
+              "rule": "required",
+              "type": "double",
+              "id": 5
+            },
+            "bwdFactorB": {
+              "rule": "required",
+              "type": "double",
+              "id": 6
+            },
+            "splitBase": {
+              "type": "int32",
+              "id": 7
+            },
+            "splitErt": {
+              "type": "int32",
+              "id": 8
+            },
+            "joinBase": {
+              "type": "int32",
+              "id": 9
+            },
+            "joinErt": {
+              "type": "int32",
+              "id": 10
+            },
+            "bonusBase": {
+              "type": "int32",
+              "id": 11
+            },
+            "bonusErt": {
+              "type": "int32",
+              "id": 12
+            },
+            "transferBase": {
+              "type": "int32",
+              "id": 13
+            },
+            "transferErt": {
+              "type": "int32",
+              "id": 14
+            },
+            "allotBase": {
+              "type": "int32",
+              "id": 15
+            },
+            "allotErt": {
+              "type": "int32",
+              "id": 16
+            },
+            "allotPrice": {
+              "type": "double",
+              "id": 17
+            },
+            "addBase": {
+              "type": "int32",
+              "id": 18
+            },
+            "addErt": {
+              "type": "int32",
+              "id": 19
+            },
+            "addPrice": {
+              "type": "double",
+              "id": 20
+            },
+            "dividend": {
+              "type": "double",
+              "id": 21
+            },
+            "spDividend": {
+              "type": "double",
+              "id": 22
+            },
+            "timestamp": {
+              "type": "double",
+              "id": 23
+            }
+          }
+        }
+      }
+    },
+    "GetUserInfo": {
+      "nested": {
+        "QotRight": {
+          "values": {
+            "QotRight_Unknow": 0,
+            "QotRight_Bmp": 1,
+            "QotRight_Level1": 2,
+            "QotRight_Level2": 3
+          }
+        },
+        "C2S": {
+          "fields": {
+            "userID": {
+              "rule": "required",
+              "type": "uint64",
+              "id": 1
+            }
+          }
+        },
+        "S2C": {
+          "fields": {
+            "nickName": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "avatarUrl": {
+              "rule": "required",
+              "type": "string",
+              "id": 2
+            },
+            "apiLevel": {
+              "rule": "required",
+              "type": "string",
+              "id": 3
+            },
+            "hkQotRight": {
+              "rule": "required",
+              "type": "int32",
+              "id": 4
+            },
+            "usQotRight": {
+              "rule": "required",
+              "type": "int32",
+              "id": 5
+            },
+            "cnQotRight": {
+              "rule": "required",
+              "type": "int32",
+              "id": 6
+            },
+            "isNeedAgreeDisclaimer": {
+              "rule": "required",
+              "type": "bool",
+              "id": 7
+            },
+            "userID": {
+              "rule": "required",
+              "type": "int64",
+              "id": 8
+            }
+          }
+        },
+        "Request": {
+          "fields": {
+            "c2s": {
+              "rule": "required",
+              "type": "C2S",
+              "id": 1
+            }
+          }
+        },
+        "Response": {
+          "fields": {
+            "retType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "default": -400
+              }
+            },
+            "retMsg": {
+              "type": "string",
+              "id": 2
+            },
+            "errCode": {
+              "type": "int32",
+              "id": 3
+            },
+            "s2c": {
+              "type": "S2C",
+              "id": 4
+            }
+          }
         }
       }
     },
@@ -884,6 +1268,10 @@
             "recvNotify": {
               "type": "bool",
               "id": 3
+            },
+            "packetEncAlgo": {
+              "type": "int32",
+              "id": 4
             }
           }
         },
@@ -1261,6 +1649,10 @@
             "nextKLTime": {
               "type": "string",
               "id": 3
+            },
+            "nextKLTimestamp": {
+              "type": "double",
+              "id": 4
             }
           }
         },
@@ -1641,6 +2033,10 @@
               "rule": "repeated",
               "type": "OptionItem",
               "id": 2
+            },
+            "strikeTimestamp": {
+              "type": "double",
+              "id": 3
             }
           }
         },
@@ -2144,117 +2540,6 @@
             }
           }
         },
-        "CompanyAct": {
-          "values": {
-            "CompanyAct_None": 0,
-            "CompanyAct_Split": 1,
-            "CompanyAct_Join": 2,
-            "CompanyAct_Bonus": 4,
-            "CompanyAct_Transfer": 8,
-            "CompanyAct_Allot": 16,
-            "CompanyAct_Add": 32,
-            "CompanyAct_Dividend": 64,
-            "CompanyAct_SPDividend": 128
-          }
-        },
-        "Rehab": {
-          "fields": {
-            "time": {
-              "rule": "required",
-              "type": "string",
-              "id": 1
-            },
-            "companyActFlag": {
-              "rule": "required",
-              "type": "int64",
-              "id": 2
-            },
-            "fwdFactorA": {
-              "rule": "required",
-              "type": "double",
-              "id": 3
-            },
-            "fwdFactorB": {
-              "rule": "required",
-              "type": "double",
-              "id": 4
-            },
-            "bwdFactorA": {
-              "rule": "required",
-              "type": "double",
-              "id": 5
-            },
-            "bwdFactorB": {
-              "rule": "required",
-              "type": "double",
-              "id": 6
-            },
-            "splitBase": {
-              "type": "int32",
-              "id": 7
-            },
-            "splitErt": {
-              "type": "int32",
-              "id": 8
-            },
-            "joinBase": {
-              "type": "int32",
-              "id": 9
-            },
-            "joinErt": {
-              "type": "int32",
-              "id": 10
-            },
-            "bonusBase": {
-              "type": "int32",
-              "id": 11
-            },
-            "bonusErt": {
-              "type": "int32",
-              "id": 12
-            },
-            "transferBase": {
-              "type": "int32",
-              "id": 13
-            },
-            "transferErt": {
-              "type": "int32",
-              "id": 14
-            },
-            "allotBase": {
-              "type": "int32",
-              "id": 15
-            },
-            "allotErt": {
-              "type": "int32",
-              "id": 16
-            },
-            "allotPrice": {
-              "type": "double",
-              "id": 17
-            },
-            "addBase": {
-              "type": "int32",
-              "id": 18
-            },
-            "addErt": {
-              "type": "int32",
-              "id": 19
-            },
-            "addPrice": {
-              "type": "double",
-              "id": 20
-            },
-            "dividend": {
-              "type": "double",
-              "id": 21
-            },
-            "spDividend": {
-              "type": "double",
-              "id": 22
-            }
-          }
-        },
         "SecurityRehab": {
           "fields": {
             "security": {
@@ -2264,7 +2549,7 @@
             },
             "rehabList": {
               "rule": "repeated",
-              "type": "Rehab",
+              "type": "Qot_Common.Rehab",
               "id": 2
             }
           }
@@ -2454,6 +2739,14 @@
               "rule": "required",
               "type": "double",
               "id": 13
+            },
+            "maturityTimestamp": {
+              "type": "double",
+              "id": 14
+            },
+            "endTradeTimestamp": {
+              "type": "double",
+              "id": 15
             }
           }
         },
@@ -2523,6 +2816,10 @@
               "rule": "required",
               "type": "double",
               "id": 13
+            },
+            "strikeTimestamp": {
+              "type": "double",
+              "id": 14
             }
           }
         },
@@ -2602,6 +2899,58 @@
               "rule": "required",
               "type": "double",
               "id": 15
+            },
+            "listTimestamp": {
+              "type": "double",
+              "id": 16
+            },
+            "updateTimestamp": {
+              "type": "double",
+              "id": 17
+            },
+            "askPrice": {
+              "type": "double",
+              "id": 18
+            },
+            "bidPrice": {
+              "type": "double",
+              "id": 19
+            },
+            "askVol": {
+              "type": "int64",
+              "id": 20
+            },
+            "bidVol": {
+              "type": "int64",
+              "id": 21
+            },
+            "enableMargin": {
+              "type": "bool",
+              "id": 22
+            },
+            "mortgageRatio": {
+              "type": "double",
+              "id": 23
+            },
+            "longMarginInitialRatio": {
+              "type": "double",
+              "id": 24
+            },
+            "enableShortSell": {
+              "type": "bool",
+              "id": 25
+            },
+            "shortSellRate": {
+              "type": "double",
+              "id": 26
+            },
+            "shortAvailableVolume": {
+              "type": "int64",
+              "id": 27
+            },
+            "shortMarginInitialRatio": {
+              "type": "double",
+              "id": 28
             }
           }
         },
@@ -2824,6 +3173,10 @@
               "rule": "required",
               "type": "string",
               "id": 1
+            },
+            "timestamp": {
+              "type": "double",
+              "id": 2
             }
           }
         },
@@ -2977,6 +3330,14 @@
               "rule": "required",
               "type": "string",
               "id": 1
+            },
+            "timestamp": {
+              "type": "double",
+              "id": 2
+            },
+            "tradeDateType": {
+              "type": "int32",
+              "id": 3
             }
           }
         },
@@ -2986,6 +3347,421 @@
               "rule": "repeated",
               "type": "TradeDate",
               "id": 1
+            }
+          }
+        },
+        "Request": {
+          "fields": {
+            "c2s": {
+              "rule": "required",
+              "type": "C2S",
+              "id": 1
+            }
+          }
+        },
+        "Response": {
+          "fields": {
+            "retType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "default": -400
+              }
+            },
+            "retMsg": {
+              "type": "string",
+              "id": 2
+            },
+            "errCode": {
+              "type": "int32",
+              "id": 3
+            },
+            "s2c": {
+              "type": "S2C",
+              "id": 4
+            }
+          }
+        }
+      }
+    },
+    "Qot_GetWarrant": {
+      "nested": {
+        "C2S": {
+          "fields": {
+            "begin": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "num": {
+              "rule": "required",
+              "type": "int32",
+              "id": 2
+            },
+            "sortField": {
+              "rule": "required",
+              "type": "int32",
+              "id": 3
+            },
+            "ascend": {
+              "rule": "required",
+              "type": "bool",
+              "id": 4
+            },
+            "owner": {
+              "type": "Qot_Common.Security",
+              "id": 5
+            },
+            "typeList": {
+              "rule": "repeated",
+              "type": "int32",
+              "id": 6,
+              "options": {
+                "packed": false
+              }
+            },
+            "issuerList": {
+              "rule": "repeated",
+              "type": "int32",
+              "id": 7,
+              "options": {
+                "packed": false
+              }
+            },
+            "maturityTimeMin": {
+              "type": "string",
+              "id": 8
+            },
+            "maturityTimeMax": {
+              "type": "string",
+              "id": 9
+            },
+            "ipoPeriod": {
+              "type": "int32",
+              "id": 10
+            },
+            "priceType": {
+              "type": "int32",
+              "id": 11
+            },
+            "status": {
+              "type": "int32",
+              "id": 12
+            },
+            "curPriceMin": {
+              "type": "double",
+              "id": 13
+            },
+            "curPriceMax": {
+              "type": "double",
+              "id": 14
+            },
+            "strikePriceMin": {
+              "type": "double",
+              "id": 15
+            },
+            "strikePriceMax": {
+              "type": "double",
+              "id": 16
+            },
+            "streetMin": {
+              "type": "double",
+              "id": 17
+            },
+            "streetMax": {
+              "type": "double",
+              "id": 18
+            },
+            "conversionMin": {
+              "type": "double",
+              "id": 19
+            },
+            "conversionMax": {
+              "type": "double",
+              "id": 20
+            },
+            "volMin": {
+              "type": "uint64",
+              "id": 21
+            },
+            "volMax": {
+              "type": "uint64",
+              "id": 22
+            },
+            "premiumMin": {
+              "type": "double",
+              "id": 23
+            },
+            "premiumMax": {
+              "type": "double",
+              "id": 24
+            },
+            "leverageRatioMin": {
+              "type": "double",
+              "id": 25
+            },
+            "leverageRatioMax": {
+              "type": "double",
+              "id": 26
+            },
+            "deltaMin": {
+              "type": "double",
+              "id": 27
+            },
+            "deltaMax": {
+              "type": "double",
+              "id": 28
+            },
+            "impliedMin": {
+              "type": "double",
+              "id": 29
+            },
+            "impliedMax": {
+              "type": "double",
+              "id": 30
+            },
+            "recoveryPriceMin": {
+              "type": "double",
+              "id": 31
+            },
+            "recoveryPriceMax": {
+              "type": "double",
+              "id": 32
+            },
+            "priceRecoveryRatioMin": {
+              "type": "double",
+              "id": 33
+            },
+            "priceRecoveryRatioMax": {
+              "type": "double",
+              "id": 34
+            }
+          }
+        },
+        "WarrantData": {
+          "fields": {
+            "stock": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 1
+            },
+            "owner": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 2
+            },
+            "type": {
+              "rule": "required",
+              "type": "int32",
+              "id": 3
+            },
+            "issuer": {
+              "rule": "required",
+              "type": "int32",
+              "id": 4
+            },
+            "maturityTime": {
+              "rule": "required",
+              "type": "string",
+              "id": 5
+            },
+            "maturityTimestamp": {
+              "type": "double",
+              "id": 6
+            },
+            "listTime": {
+              "rule": "required",
+              "type": "string",
+              "id": 7
+            },
+            "listTimestamp": {
+              "type": "double",
+              "id": 8
+            },
+            "lastTradeTime": {
+              "rule": "required",
+              "type": "string",
+              "id": 9
+            },
+            "lastTradeTimestamp": {
+              "type": "double",
+              "id": 10
+            },
+            "recoveryPrice": {
+              "type": "double",
+              "id": 11
+            },
+            "conversionRatio": {
+              "rule": "required",
+              "type": "double",
+              "id": 12
+            },
+            "lotSize": {
+              "rule": "required",
+              "type": "int32",
+              "id": 13
+            },
+            "strikePrice": {
+              "rule": "required",
+              "type": "double",
+              "id": 14
+            },
+            "lastClosePrice": {
+              "rule": "required",
+              "type": "double",
+              "id": 15
+            },
+            "name": {
+              "rule": "required",
+              "type": "string",
+              "id": 16
+            },
+            "curPrice": {
+              "rule": "required",
+              "type": "double",
+              "id": 17
+            },
+            "priceChangeVal": {
+              "rule": "required",
+              "type": "double",
+              "id": 18
+            },
+            "changeRate": {
+              "rule": "required",
+              "type": "double",
+              "id": 19
+            },
+            "status": {
+              "rule": "required",
+              "type": "int32",
+              "id": 20
+            },
+            "bidPrice": {
+              "rule": "required",
+              "type": "double",
+              "id": 21
+            },
+            "askPrice": {
+              "rule": "required",
+              "type": "double",
+              "id": 22
+            },
+            "bidVol": {
+              "rule": "required",
+              "type": "int64",
+              "id": 23
+            },
+            "askVol": {
+              "rule": "required",
+              "type": "int64",
+              "id": 24
+            },
+            "volume": {
+              "rule": "required",
+              "type": "int64",
+              "id": 25
+            },
+            "turnover": {
+              "rule": "required",
+              "type": "double",
+              "id": 26
+            },
+            "score": {
+              "rule": "required",
+              "type": "double",
+              "id": 27
+            },
+            "premium": {
+              "rule": "required",
+              "type": "double",
+              "id": 28
+            },
+            "breakEvenPoint": {
+              "rule": "required",
+              "type": "double",
+              "id": 29
+            },
+            "leverage": {
+              "rule": "required",
+              "type": "double",
+              "id": 30
+            },
+            "ipop": {
+              "rule": "required",
+              "type": "double",
+              "id": 31
+            },
+            "priceRecoveryRatio": {
+              "type": "double",
+              "id": 32
+            },
+            "conversionPrice": {
+              "rule": "required",
+              "type": "double",
+              "id": 33
+            },
+            "streetRate": {
+              "rule": "required",
+              "type": "double",
+              "id": 34
+            },
+            "streetVol": {
+              "rule": "required",
+              "type": "int64",
+              "id": 35
+            },
+            "amplitude": {
+              "rule": "required",
+              "type": "double",
+              "id": 36
+            },
+            "issueSize": {
+              "rule": "required",
+              "type": "int64",
+              "id": 37
+            },
+            "highPrice": {
+              "rule": "required",
+              "type": "double",
+              "id": 39
+            },
+            "lowPrice": {
+              "rule": "required",
+              "type": "double",
+              "id": 40
+            },
+            "impliedVolatility": {
+              "type": "double",
+              "id": 41
+            },
+            "delta": {
+              "type": "double",
+              "id": 42
+            },
+            "effectiveLeverage": {
+              "rule": "required",
+              "type": "double",
+              "id": 43
+            }
+          }
+        },
+        "S2C": {
+          "fields": {
+            "lastPage": {
+              "rule": "required",
+              "type": "bool",
+              "id": 1
+            },
+            "allCount": {
+              "rule": "required",
+              "type": "int32",
+              "id": 2
+            },
+            "warrantDataList": {
+              "rule": "repeated",
+              "type": "WarrantData",
+              "id": 3
             }
           }
         },
@@ -3156,6 +3932,143 @@
             "nextReqKey": {
               "type": "bytes",
               "id": 3
+            }
+          }
+        },
+        "Request": {
+          "fields": {
+            "c2s": {
+              "rule": "required",
+              "type": "C2S",
+              "id": 1
+            }
+          }
+        },
+        "Response": {
+          "fields": {
+            "retType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "default": -400
+              }
+            },
+            "retMsg": {
+              "type": "string",
+              "id": 2
+            },
+            "errCode": {
+              "type": "int32",
+              "id": 3
+            },
+            "s2c": {
+              "type": "S2C",
+              "id": 4
+            }
+          }
+        }
+      }
+    },
+    "Qot_RequestHistoryKLQuota": {
+      "nested": {
+        "DetailItem": {
+          "fields": {
+            "security": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 1
+            },
+            "requestTime": {
+              "rule": "required",
+              "type": "string",
+              "id": 2
+            },
+            "requestTimeStamp": {
+              "type": "int64",
+              "id": 3
+            }
+          }
+        },
+        "C2S": {
+          "fields": {
+            "bGetDetail": {
+              "type": "bool",
+              "id": 2
+            }
+          }
+        },
+        "S2C": {
+          "fields": {
+            "usedQuota": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "remainQuota": {
+              "rule": "required",
+              "type": "int32",
+              "id": 2
+            },
+            "detailList": {
+              "rule": "repeated",
+              "type": "DetailItem",
+              "id": 3
+            }
+          }
+        },
+        "Request": {
+          "fields": {
+            "c2s": {
+              "rule": "required",
+              "type": "C2S",
+              "id": 1
+            }
+          }
+        },
+        "Response": {
+          "fields": {
+            "retType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "default": -400
+              }
+            },
+            "retMsg": {
+              "type": "string",
+              "id": 2
+            },
+            "errCode": {
+              "type": "int32",
+              "id": 3
+            },
+            "s2c": {
+              "type": "S2C",
+              "id": 4
+            }
+          }
+        }
+      }
+    },
+    "Qot_RequestRehab": {
+      "nested": {
+        "C2S": {
+          "fields": {
+            "security": {
+              "rule": "required",
+              "type": "Qot_Common.Security",
+              "id": 1
+            }
+          }
+        },
+        "S2C": {
+          "fields": {
+            "rehabList": {
+              "rule": "repeated",
+              "type": "Qot_Common.Rehab",
+              "id": 1
             }
           }
         },
@@ -3912,6 +4825,14 @@
             "secMarket": {
               "type": "int32",
               "id": 15
+            },
+            "createTimestamp": {
+              "type": "double",
+              "id": 16
+            },
+            "updateTimestamp": {
+              "type": "double",
+              "id": 17
             }
           }
         },
@@ -3976,6 +4897,10 @@
             "secMarket": {
               "type": "int32",
               "id": 13
+            },
+            "createTimestamp": {
+              "type": "double",
+              "id": 14
             }
           }
         },
@@ -5054,6 +5979,78 @@
               "rule": "required",
               "type": "Trd_Common.OrderFill",
               "id": 2
+            }
+          }
+        },
+        "Response": {
+          "fields": {
+            "retType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "default": -400
+              }
+            },
+            "retMsg": {
+              "type": "string",
+              "id": 2
+            },
+            "errCode": {
+              "type": "int32",
+              "id": 3
+            },
+            "s2c": {
+              "type": "S2C",
+              "id": 4
+            }
+          }
+        }
+      }
+    },
+    "Verification": {
+      "nested": {
+        "VerificationType": {
+          "values": {
+            "VerificationType_Unknow": 0,
+            "VerificationType_Picture": 1,
+            "VerificationType_Phone": 2
+          }
+        },
+        "VerificationOp": {
+          "values": {
+            "VerificationOp_Unknow": 0,
+            "VerificationOp_Request": 1,
+            "VerificationOp_InputAndLogin": 2
+          }
+        },
+        "C2S": {
+          "fields": {
+            "type": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "op": {
+              "rule": "required",
+              "type": "int32",
+              "id": 2
+            },
+            "code": {
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
+        "S2C": {
+          "fields": {}
+        },
+        "Request": {
+          "fields": {
+            "c2s": {
+              "rule": "required",
+              "type": "C2S",
+              "id": 1
             }
           }
         },
