@@ -2,7 +2,7 @@ const net = require('net');
 const protobufjs = require('protobufjs');
 const crypto = require('crypto');
 const ProtoId = require('./protoid');
-const Pb = require('./pb.json');
+const proto = require('./pb');
 
 const ProtoName = {};
 Object.keys(ProtoId).forEach(key => {
@@ -63,7 +63,7 @@ class Socket {
 
     this.isHandStop = false;
 
-    this.root = protobufjs.Root.fromJSON(Pb);
+    this.root = proto;
 
     this.cacheResponseCallback = {}; // 缓存的回调函数
     this.cacheNotifyCallback = {}; // 缓存的通知回调函数
